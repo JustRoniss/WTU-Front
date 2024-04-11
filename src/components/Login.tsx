@@ -1,100 +1,120 @@
-import { useState } from 'react';
-import './../styles/login.css'
-import useClass from './../hooks/add-class-body'
-import { useNavigate } from 'react-router-dom';
+import { useState } from "react";
+import { useRive } from '@rive-app/react-canvas';
+import "./../styles/login.css";
+import useClass from "./../hooks/add-class-body";
+import { useNavigate } from "react-router-dom";
 import {
-   Container,
-   Col,
-   Form,
-   Input,
-   InputGroup,
-   Row,
-   Card,
-   CardBody,
-   Button,
-   Modal,
-   ModalHeader,
-   ModalBody,
-   ModalFooter,
-
-} from 'reactstrap'
+  Container,
+  Col,
+  Form,
+  Input,
+  InputGroup,
+  Row,
+  Button,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+} from "reactstrap";
 
 const handleLogin = () => {
-    alert("Handle login");
-    console.info("Http request para login ainda nao desenvolvida");
-}
-
-
+  alert("Handle login");
+  console.info("Http request para login ainda nao desenvolvida");
+};
 
 const Login = () => {
-    useClass('page-login')
-    let navigate = useNavigate();
+  useClass("page-login");
+  let navigate = useNavigate();
 
-    const HandleNavigation = () => {
-        navigate('/create-account'); 
-    };
-   
-    const [modalForgot, setModalForgot] = useState(false); 
-    const toggle = () => setModalForgot(!modalForgot)
+  const HandleNavigation = () => {
+    navigate("/create-account");
+  };
 
-    return (
-        <div className="login-container">
-              <Container>
-                <Row className="justify-content-center align-items-center login-row">
-                    <Col md="6">
-                        <Card>
-                            <CardBody>
-                                <Form>
-                                    <div className="text-center mb-4">
-                                        <h1>Wise to Us</h1>
-                                        {/* colocar logo  */}
-                                    </div>
-                                    <InputGroup className="mb-3">
-                                        <Input type="text" placeholder="E-mail"/>
-                                    </InputGroup>
+  const [modalForgot, setModalForgot] = useState(false);
+  const toggle = () => setModalForgot(!modalForgot);
 
-                                    <InputGroup className="mb-3">
-                                        <Input type="password" placeholder="Senha"/>
-                                    </InputGroup>
+  const { rive, RiveComponent } = useRive({
+    src: './../../public/orange_guy.riv',
 
-                                    <Row form>
-                                        <Col>
-                                            <Button color="primary" onClick={handleLogin}>Acessar!</Button>
-                                        </Col>
-                                        <Col className="text-right">
-                                            <Button color="link" onClick={toggle}>Esqueci a senha</Button>
-                                        </Col>
-                                    </Row>
-                                </Form>
+    autoplay: false,
+  });
 
-                                <p className='mt-5 text-center'>Não possui uma conta?</p>
-                                <div className='button-container'>
-                                    <Button className='heartbeat button-53 btn-lg rd-2' color="primary" onClick={HandleNavigation}>Cadastre-se</Button>
-                                </div>
-                            </CardBody>
-                        </Card>
-                    </Col>
-                </Row>
-            </Container>
+  const handleMouseEnter = () => {
+    if (rive) {
+      rive.play('Cat');
+    }
+  };
 
+  const handleMouseLeave = () => {
+    if (rive) {
+      rive.play('idle');
+    }
+  };
 
-            <Modal isOpen={modalForgot} toggle={toggle}>
-                <ModalHeader toggle={toggle}>Recuperação de Senha</ModalHeader>
-                <ModalBody>
-                    <Form>
-                        <InputGroup className="mb-3">
-                            <Input type="email" placeholder="Digite seu e-mail" />
-                        </InputGroup>
-                    </Form>
-                </ModalBody>
-                <ModalFooter>
-                    <Button color="primary" onClick={toggle}>Enviar</Button>{' '}
-                    <Button color="secondary" onClick={toggle}>Cancelar</Button>
-                </ModalFooter>
-            </Modal>
+  return (
+    <div className="login-container">
+      <Container fluid className="h-100">
+        <Row className="h-100 no-gutters">
+          <Col md="8" className="d-flex align-items-center">
+            <div className="container-animation w-100 h-100">
+              <RiveComponent
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              />
+            </div>
+          </Col>
+          <Col
+            md="4"
+            className="d-flex align-items-center justify-content-center"
+          >
+            <div className="login-form-container">
+              <Form>
+                <h1 className="mb-4">Wise to Us</h1>
+                {/* Inserir logo */}
+                <InputGroup className="mb-3">
+                  <Input type="text" placeholder="E-mail" />
+                </InputGroup>
+                <InputGroup className="mb-3">
+                  <Input type="password" placeholder="Senha" />
+                </InputGroup>
+                <Button color="primary" onClick={handleLogin}>
+                  Acessar!
+                </Button>
+                <div className="forgot-signup-links">
+                  <Button color="link" onClick={toggle}>
+                    Esqueci a senha
+                  </Button>
+                  <Button className="heartbeat button-53" onClick={HandleNavigation}>
+                    Cadastre-se
+                  </Button>
+                </div>
+              </Form>
+            </div>
+          </Col>
+        </Row>
+      </Container>
 
-        </div>
-    )
-}
+      <Modal isOpen={modalForgot} toggle={toggle}>
+        <ModalHeader toggle={toggle}>Recuperação de Senha</ModalHeader>
+        <ModalBody>
+          <Form>
+            <InputGroup className="mb-3">
+              <Input type="email" placeholder="Digite seu e-mail" />
+            </InputGroup>
+          </Form>
+        </ModalBody>
+        <ModalFooter>
+          <Button color="primary" onClick={toggle}>
+            Enviar
+          </Button>{" "}
+          <Button color="secondary" onClick={toggle}>
+            Cancelar
+          </Button>
+        </ModalFooter>
+      </Modal>
+    </div>
+  );
+};
 
 export default Login;

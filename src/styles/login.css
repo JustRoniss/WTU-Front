@@ -1,20 +1,29 @@
+
+.login-container {
+    height: 100vh;
+  }
+  
+  .container-animation {
+    background: linear-gradient(to right, #FCA498, #D57195, #8052A5);
+  }
+  
+  .login-form-container {
+
+    width: 100%;
+    max-width: 100%;
+    padding: 1rem; 
+  }
+  
+  .forgot-signup-links {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+  }
+
 .login-container .login-row {
     height: 100vh;
   }
-  .login-container h1 {
-    margin-bottom: 1rem;
-  }
-  .login-container .card {
-    padding: 2rem;
-    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.9);
-  }
-  .login-container .btn-link {
-    color: #007bff;
-    float: right;
-  }
-  .login-container .btn-link:hover {
-    text-decoration: underline;
-  }
+
   .login-container .button-container {
     display: flex;
     justify-content: center;
