@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useRive } from '@rive-app/react-canvas';
+import { useRive } from "@rive-app/react-canvas";
 import "./../styles/login.css";
 import useClass from "./../hooks/add-class-body";
 import { useNavigate } from "react-router-dom";
@@ -34,20 +34,20 @@ const Login = () => {
   const toggle = () => setModalForgot(!modalForgot);
 
   const { rive, RiveComponent } = useRive({
-    src: './../../public/orange_guy.riv',
-
-    autoplay: false,
+    src: "./../../public/orange_guy_cat.riv",
+    stateMachines: "idle",
+    autoplay: true,
   });
 
   const handleMouseEnter = () => {
     if (rive) {
-      rive.play('Cat');
+      rive.play("Cat");
     }
   };
 
   const handleMouseLeave = () => {
     if (rive) {
-      rive.play('idle');
+      rive.play("idle");
     }
   };
 
@@ -64,32 +64,39 @@ const Login = () => {
               />
             </div>
           </Col>
-          <Col
-            md="4"
-            className="d-flex align-items-center justify-content-center"
-          >
+          <Col md="4" className="d-flex align-items-center justify-content-center">
             <div className="login-form-container">
               <Form>
-                <h1 className="mb-4">Wise to Us</h1>
-                {/* Inserir logo */}
+                <div className="text-center mb-4">
+                  <h1>Wise to Us</h1>
+                  {/* colocar logo  */}
+                </div>
                 <InputGroup className="mb-3">
                   <Input type="text" placeholder="E-mail" />
                 </InputGroup>
+
                 <InputGroup className="mb-3">
                   <Input type="password" placeholder="Senha" />
                 </InputGroup>
-                <Button color="primary" onClick={handleLogin}>
+
+                <Row form>
+                  <Col className="">
+                    <Button color="link" onClick={toggle}>
+                      Esqueci a senha
+                    </Button>
+                  </Col>
+                </Row>
+              </Form>
+   
+              <div className="button-container">
+                <Button
+                  className="heartbeat button-53 btn-lg rd-2"
+                  color="primary"
+                  onClick={HandleNavigation}
+                >
                   Acessar!
                 </Button>
-                <div className="forgot-signup-links">
-                  <Button color="link" onClick={toggle}>
-                    Esqueci a senha
-                  </Button>
-                  <Button className="heartbeat button-53" onClick={HandleNavigation}>
-                    Cadastre-se
-                  </Button>
-                </div>
-              </Form>
+              </div>
             </div>
           </Col>
         </Row>
