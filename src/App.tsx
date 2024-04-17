@@ -7,19 +7,27 @@ import {
 import Login from './components/Login'
 import Home from './components/Home'
 import NotFound from './components/NotFound'
+import PrivateRoute from './security/PrivateRoute'
 
-
-
-export default function App() {
-  return(
+const App: React.FC = () => {
+  return (
     <Router>
       <Routes>
-        <Route path="/home" element={<Home/>} />
-        <Route path="/" element={<Home />} />
+        <Route path="/home" element={
+          <PrivateRoute>
+            <Home />
+          </PrivateRoute>
+        } />
+        <Route path="/" element={
+          <PrivateRoute>
+            <Login />
+          </PrivateRoute>
+        } />
         <Route path="/login" element={<Login />} />
         <Route path="*" element={<NotFound />} />
-        {/* <Route path="/create-account" element={<CreateAcc/>} /> */}
       </Routes>
     </Router>
-  ) 
+  ); 
 }
+
+export default App;

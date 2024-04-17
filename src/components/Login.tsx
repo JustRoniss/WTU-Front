@@ -1,6 +1,8 @@
 import { FormEvent, useState } from "react";
 import { useRive } from "@rive-app/react-canvas";
+import axios from 'axios'
 import "./../styles/login.css";
+import { useNavigate } from 'react-router-dom';
 import { Radio, RadioChangeEvent, Space } from "antd";
 import {
   Container,
@@ -20,11 +22,29 @@ import {
 
 const LoginForm = () => {
   const [modalForgot, setModalForgot] = useState(false);
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const navigate = useNavigate();
+  
   const toggle = () => setModalForgot(!modalForgot);
 
-  const handleLogin = () => {
-    alert("Handle login");
-    console.info("Http request para login ainda nao desenvolvida");
+  const handleLogin = async (email: string, password: string) => {
+    try{
+      const response = await axios.post('http://localhost:8080/auth/login', {
+        email: email,
+        password: password
+      });
+
+      const token = response.data.token
+      console.log("Token recebido " + token)
+
+      localStorage.setItem('token', token)
+      navigate('/home');
+
+    }catch(error){
+      console.error("Erro no login: " + error)
+      alert("Falha no login")
+    }
   };
 
   return (
@@ -37,10 +57,10 @@ const LoginForm = () => {
         }}
       >
         <InputGroup className="mb-3 w-50">
-          <Input type="text" placeholder="E-mail" />
+          <Input type="text" placeholder="E-mail"  onChange={(e) => setEmail(e.target.value)}/>
         </InputGroup>
         <InputGroup className=" w-50">
-          <Input type="password" placeholder="Senha" />
+          <Input type="password" placeholder="Senha"  onChange={(e) => setPassword(e.target.value)} />
         </InputGroup>
       </div>
       <Row >
@@ -54,7 +74,7 @@ const LoginForm = () => {
         <Button
           className="heartbeat button-53 btn-lg rd-2"
           color="primary"
-          onClick={handleLogin}
+          onClick={() => handleLogin(email, password)}
         >
           Acessar!
         </Button>
@@ -90,6 +110,7 @@ const SignUpForm = () => {
   const [repeatPassword, setRepeatPassword] = useState('');
   const [error, setError] = useState('');
 
+
   const validatePassword = (password: string): boolean => {
     const minLength = 8;
     const hasNumber = /\d/.test(password);
@@ -100,7 +121,7 @@ const SignUpForm = () => {
     return password.length >= minLength && hasNumber && hasUpper && hasLower && hasSpecial;
   };
 
-  const handleSignUp = (e: FormEvent<HTMLFormElement>) => {
+  const handleSignUp = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (password !== repeatPassword) {
@@ -109,11 +130,18 @@ const SignUpForm = () => {
       setError('A senha deve conter ao menos 8 caracteres, incluindo números, letras maiúsculas, letras minúsculas e caracteres especiais.');
       return;
     }
-    else {
-      setError('');
-      console.log('Submit:', { fullName, email, password });
-      // Envio pro backend aqui
+
+    try{
+      await axios.post("http://localhost:8080/auth/register", {
+        name: fullName,
+        email: email,
+        password: password
+      });
+      alert("Conta criada com sucesso!")
+    }catch(error){
+      setError("Erro ao se registrar")
     }
+
   };
   return (
     <Form className="sign-up-form" onSubmit={handleSignUp}>
