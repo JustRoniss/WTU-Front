@@ -44,13 +44,13 @@ const LoginForm = () => {
         </InputGroup>
       </div>
       <Row >
-        <Col className="">
+        <Col className="text-center">
           <Button color="link" onClick={toggle}>
             Esqueci a senha
           </Button>
         </Col>
       </Row>
-      <div className="button-container">
+      <div className="button-container mt-5">
         <Button
           className="heartbeat button-53 btn-lg rd-2"
           color="primary"
