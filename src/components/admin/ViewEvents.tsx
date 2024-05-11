@@ -50,8 +50,8 @@ const ViewEvents: React.FC  = () => {
     ];
 
     return (
-        <div>
-            <h1>Eventos</h1>
+        <div style={{ padding: 24, minHeight: 360, background: '#fff' }}>
+            <h1>Visualizar eventos</h1>
             <Table dataSource={events} columns={columns} rowKey="id" />
         </div>
     );

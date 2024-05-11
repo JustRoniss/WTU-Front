@@ -1,9 +1,10 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useRive } from "@rive-app/react-canvas";
 import axios from 'axios'
 import "./../styles/login.css";
-import { useNavigate } from 'react-router-dom';
 import { Radio, RadioChangeEvent, Space } from "antd";
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from './../security/AuthProvider';
 import {
   Container,
   Col,
@@ -24,7 +25,9 @@ const LoginForm = () => {
   const [modalForgot, setModalForgot] = useState(false);
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const { hasRole } = useAuth();
   const navigate = useNavigate();
+
   
   const toggle = () => setModalForgot(!modalForgot);
 
@@ -35,17 +38,24 @@ const LoginForm = () => {
         password: password
       });
 
-      const token = response.data.token
-      console.log("Token recebido " + token)
+      const token = response.data.token;
+      console.log("Token recebido " + token);
 
-      localStorage.setItem('token', token)
-      navigate('/home');
+      localStorage.setItem('token', token);
 
-    }catch(error){
-      console.error("Erro no login: " + error)
-      alert("Falha no login")
+      setTimeout(() => {
+        if (hasRole('ADMIN')) {
+            navigate('/admin');
+        } else {
+            navigate('/home');
+        }
+      }, 10);
+
+    } catch(error) {
+      console.error("Erro no login: ", error);
+      alert("Falha no login");
     }
-  };
+};
 
   return (
     <>

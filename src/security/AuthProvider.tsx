@@ -43,7 +43,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const hasRole = (role: string): boolean => {
-    console.log("A role é: " + role)
     if (!token) return false;
     try {
       const decoded: AuthToken = jwtDecode<AuthToken>(token);
