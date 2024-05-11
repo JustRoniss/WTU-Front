@@ -3,14 +3,15 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import Login from './components/Login';
 import Home from './components/Home';
+import Painel from './components/admin/Painel'
 import NotFound from './components/NotFound';
 import PrivateRoute from './security/PrivateRoute';
-import AuthManager from './security/AuthManager'; // Importe o novo componente
+import AuthManager from './security/AuthManager'; 
 
 const App: React.FC = () => {
   return (
     <Router>
-      <AuthManager /> {/* Colocado logo dentro do Router para gerenciar a autenticação */}
+      <AuthManager />
       <Routes>
         <Route path="/home" element={
           <PrivateRoute>
@@ -24,6 +25,14 @@ const App: React.FC = () => {
           </PrivateRoute>
         } />
         <Route path="*" element={<NotFound />} />
+
+        <Route path="/admin" element= {
+          <PrivateRoute>
+            <Painel />
+          </PrivateRoute>
+        } />
+
+        
       </Routes>
     </Router>
   );
