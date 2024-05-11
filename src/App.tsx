@@ -8,6 +8,7 @@ import NotFound from './components/NotFound';
 import { AuthProvider } from './security/AuthProvider'; 
 import ProtectedRoute from './security/ProtectedRoute'
 import CreateEvents from './components/admin/CreateEvents';
+import ViewEvents from './components/admin/ViewEvents';
 
 const App: React.FC = () => {
   return (
@@ -19,7 +20,7 @@ const App: React.FC = () => {
           <Route path="/home" element={<ProtectedRoute element={<Home />} />} />
           <Route path="/admin/*" element={<ProtectedRoute roles={['ADMIN']} element={<Painel />} />}>
             <Route path="create-events" element={<CreateEvents />} />
-            {/* Define other sub-routes within admin here if necessary */}
+            <Route path="view-events" element={<ViewEvents />} />
           </Route>
         </Routes>
       </Router>

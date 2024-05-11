@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form, Input, Button, DatePicker } from 'antd';
-import axios from 'axios';
 import { Moment } from 'moment';
+import api from '../../config/axiosConfig';
 
 const { RangePicker } = DatePicker;
 
@@ -25,7 +25,7 @@ const CreateEvents: React.FC = () => {
             userEmails: ['example@example.com']
         };
 
-        axios.post('http://localhost:8080/events/create', event, {
+        api.post('http://localhost:8080/events/create', event, {
             headers: {
                 Authorization: `Bearer ${token}`
             }
