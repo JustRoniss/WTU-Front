@@ -16,11 +16,11 @@ interface AuthContextType {
   getRoleFromToken: (token: string) => string | null; 
 }
 
-interface DecodedToken{
-  role?: string;
-  exp?: number;
-  iat?: number;
-}
+// interface DecodedToken{
+//   roles?: string;
+//   exp?: number;
+//   iat?: number;
+// }
 
 const AuthContext = createContext<AuthContextType>(null!);
 
@@ -62,9 +62,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const getRoleFromToken = (token: string): string | null => {
+    console.log("cheguei no get role")
     try{
-      const decoded: DecodedToken = jwtDecode(token)
-      return decoded.role || null
+      const decoded: AuthToken = jwtDecode(token);
+      return decoded.roles
     }catch(error){
       console.log("Error to decode token: ", error)
       return null;

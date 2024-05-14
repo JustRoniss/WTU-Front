@@ -40,40 +40,51 @@ const LoginForm = () => {
       localStorage.setItem('token', token);
       
       signIn(token); 
-
-      await new Promise(resolve => setTimeout(resolve, 100));  
-
       const role = getRoleFromToken(token);
-      if (role === 'ADMIN') {
-        navigate("/admin");
-      } else if (role === 'USER') {
-        navigate("/home");
-      } else {
-        navigate("/login");
-      }
+      console.log("token biri" + token)
+      console.log("Role logada: " + role)
+
     } catch (error) {
       console.error("Erro no login: ", error);
       alert("Falha no login");
     }
-};
-
-useEffect(() => {
-  const token = localStorage.getItem('token'); 
-  if (token) {
-    const role = getRoleFromToken(token);
-    switch (role) {
-      case 'ADMIN':
-        navigate('/admin');
-        break;
-      case 'USER':
-        navigate('/home');
-        break;
-      default:
-        navigate('/login');
-        break;
+    finally{
+      var token = localStorage.getItem('token')
+      if(token){
+        doRedirect(token)
+      }   
     }
+  };
+
+const doRedirect = (token: string) => {
+  const role = getRoleFromToken(token)
+  console.log("Role obtida: " + role)
+  if (role === 'ADMIN') {
+    navigate("/admin");
+  } else if (role === 'USER') {
+    navigate("/home");
+  } else {
+    navigate("/login");
   }
-}, [navigate, getRoleFromToken]); 
+}
+
+// useEffect(() => {
+//   const token = localStorage.getItem('token'); 
+//   if (token) {
+//     const role = getRoleFromToken(token);
+//     switch (role) {
+//       case 'ADMIN':
+//         navigate('/admin');
+//         break;
+//       case 'USER':
+//         navigate('/home');
+//         break;
+//       default:
+//         navigate('/login');
+//         break;
+//     }
+//   }
+// }, [navigate, getRoleFromToken]); 
 
 
   return (
