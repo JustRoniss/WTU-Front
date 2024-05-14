@@ -43,7 +43,7 @@ const CreateEvents: React.FC = () => {
     return (
 
         <div style={{ padding: 24, minHeight: 360, background: '#fff' }}>
-                    <h1>Criar eventos</h1>
+            <h1>Criar eventos</h1>
             <Form onFinish={onFinish}>
                 <Form.Item
                     name="title"

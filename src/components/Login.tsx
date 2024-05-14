@@ -25,37 +25,56 @@ const LoginForm = () => {
   const [modalForgot, setModalForgot] = useState(false);
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const { hasRole } = useAuth();
+  const { getRoleFromToken, signIn } = useAuth();
   const navigate = useNavigate();
 
   
   const toggle = () => setModalForgot(!modalForgot);
 
   const handleLogin = async (email: string, password: string) => {
-    try{
-      const response = await axios.post('http://localhost:8080/auth/login', {
-        email: email,
-        password: password
-      });
-
-      const token = response.data.token;
-      console.log("Token recebido " + token);
-
+    try {
+      const response = await axios.post('http://localhost:8080/auth/login', { email, password });
+      const  token  = response.data.token;
+      console.log("Token recebido: " + token);
+  
       localStorage.setItem('token', token);
+      
+      signIn(token); 
 
-      setTimeout(() => {
-        if (hasRole('ADMIN')) {
-            navigate('/admin');
-        } else {
-            navigate('/home');
-        }
-      }, 10);
+      await new Promise(resolve => setTimeout(resolve, 100));  
 
-    } catch(error) {
+      const role = getRoleFromToken(token);
+      if (role === 'ADMIN') {
+        navigate("/admin");
+      } else if (role === 'USER') {
+        navigate("/home");
+      } else {
+        navigate("/login");
+      }
+    } catch (error) {
       console.error("Erro no login: ", error);
       alert("Falha no login");
     }
 };
+
+useEffect(() => {
+  const token = localStorage.getItem('token'); 
+  if (token) {
+    const role = getRoleFromToken(token);
+    switch (role) {
+      case 'ADMIN':
+        navigate('/admin');
+        break;
+      case 'USER':
+        navigate('/home');
+        break;
+      default:
+        navigate('/login');
+        break;
+    }
+  }
+}, [navigate, getRoleFromToken]); 
+
 
   return (
     <>
