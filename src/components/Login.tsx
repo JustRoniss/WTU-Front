@@ -1,9 +1,10 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useRive } from "@rive-app/react-canvas";
 import axios from 'axios'
 import "./../styles/login.css";
-import { useNavigate } from 'react-router-dom';
 import { Radio, RadioChangeEvent, Space } from "antd";
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from './../security/AuthProvider';
 import {
   Container,
   Col,
@@ -24,28 +25,67 @@ const LoginForm = () => {
   const [modalForgot, setModalForgot] = useState(false);
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const { getRoleFromToken, signIn } = useAuth();
   const navigate = useNavigate();
+
   
   const toggle = () => setModalForgot(!modalForgot);
 
   const handleLogin = async (email: string, password: string) => {
-    try{
-      const response = await axios.post('http://localhost:8080/auth/login', {
-        email: email,
-        password: password
-      });
+    try {
+      const response = await axios.post('http://localhost:8080/auth/login', { email, password });
+      const  token  = response.data.token;
+      console.log("Token recebido: " + token);
+  
+      localStorage.setItem('token', token);
+      
+      signIn(token); 
+      const role = getRoleFromToken(token);
+      console.log("token biri" + token)
+      console.log("Role logada: " + role)
 
-      const token = response.data.token
-      console.log("Token recebido " + token)
-
-      localStorage.setItem('token', token)
-      navigate('/home');
-
-    }catch(error){
-      console.error("Erro no login: " + error)
-      alert("Falha no login")
+    } catch (error) {
+      console.error("Erro no login: ", error);
+      alert("Falha no login");
+    }
+    finally{
+      var token = localStorage.getItem('token')
+      if(token){
+        doRedirect(token)
+      }   
     }
   };
+
+const doRedirect = (token: string) => {
+  const role = getRoleFromToken(token)
+  console.log("Role obtida: " + role)
+  if (role === 'ADMIN') {
+    navigate("/admin");
+  } else if (role === 'USER') {
+    navigate("/home");
+  } else {
+    navigate("/login");
+  }
+}
+
+// useEffect(() => {
+//   const token = localStorage.getItem('token'); 
+//   if (token) {
+//     const role = getRoleFromToken(token);
+//     switch (role) {
+//       case 'ADMIN':
+//         navigate('/admin');
+//         break;
+//       case 'USER':
+//         navigate('/home');
+//         break;
+//       default:
+//         navigate('/login');
+//         break;
+//     }
+//   }
+// }, [navigate, getRoleFromToken]); 
+
 
   return (
     <>

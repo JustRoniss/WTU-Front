@@ -13,7 +13,14 @@ interface AuthContextType {
   signOut: () => void;
   isAuthenticated: () => boolean;
   hasRole: (role: string) => boolean;
+  getRoleFromToken: (token: string) => string | null; 
 }
+
+// interface DecodedToken{
+//   roles?: string;
+//   exp?: number;
+//   iat?: number;
+// }
 
 const AuthContext = createContext<AuthContextType>(null!);
 
@@ -43,10 +50,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const hasRole = (role: string): boolean => {
-    console.log("A role é: " + role)
     if (!token) return false;
     try {
       const decoded: AuthToken = jwtDecode<AuthToken>(token);
+      console.log("Aqui está o JWT decoded: " +  decoded)
       return decoded.roles === role;
     } catch (error) {
       console.error('Failed to decode JWT', error);
@@ -54,8 +61,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const getRoleFromToken = (token: string): string | null => {
+    console.log("cheguei no get role")
+    try{
+      const decoded: AuthToken = jwtDecode(token);
+      return decoded.roles
+    }catch(error){
+      console.log("Error to decode token: ", error)
+      return null;
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ token, signIn, signOut, isAuthenticated, hasRole }}>
+    <AuthContext.Provider value={{ token, signIn, signOut, isAuthenticated, hasRole, getRoleFromToken }}>
       {children}
     </AuthContext.Provider>
   );

@@ -6,6 +6,10 @@ html, body {
     overflow: hidden; 
 }
 
+.full-div{
+    background-color: rgb(49, 49, 49);
+}
+
 .containerAnimation {
     width: 100vw;
     height: 100vh;
