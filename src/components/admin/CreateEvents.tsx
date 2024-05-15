@@ -21,8 +21,8 @@ const CreateEvents: React.FC = () => {
             description: values.description,
             startDate: startDate.toISOString(),
             endDate: endDate.toISOString(),
-            unitId: 1,
-            userEmails: ['example@example.com']
+            unitIds: [1, 2, 3, 4],
+            userEmails: ['ronaldo.dev@gmail.com']
         };
 
         api.post('http://localhost:8080/events/create', event, {
