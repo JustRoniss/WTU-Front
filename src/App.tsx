@@ -2,13 +2,13 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import Login from './components/Login';
-import Home from './components/Home';
+import Home from './components/user/Home';
 import Painel from './components/admin/Painel'
-import NotFound from './components/NotFound';
+import NotFound from './components/generics/NotFound';
 import { AuthProvider } from './security/AuthProvider'; 
 import ProtectedRoute from './security/ProtectedRoute'
-import CreateEvents from './components/admin/CreateEvents';
-import ViewEvents from './components/admin/ViewEvents';
+import CreateEvents from './components/admin/Event/CreateEvents';
+import ViewEvents from './components/admin/Event/ViewEvents';
 
 const App: React.FC = () => {
   return (

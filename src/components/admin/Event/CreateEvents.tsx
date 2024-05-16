@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form, Input, Button, DatePicker } from 'antd';
 import { Moment } from 'moment';
-import api from '../../config/axiosConfig';
+import api from '../../../config/axiosConfig';
 
 const { RangePicker } = DatePicker;
 
