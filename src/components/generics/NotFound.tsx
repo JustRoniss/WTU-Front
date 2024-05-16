@@ -1,5 +1,5 @@
 import Rive from '@rive-app/react-canvas';
-import './../styles/notfound.css'
+import './../../styles/notfound.css'
 
 const NotFound = () => {
     return (

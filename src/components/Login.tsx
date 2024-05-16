@@ -143,7 +143,7 @@ const doRedirect = (token: string) => {
 };
 
 
-const SignUpForm = () => {
+const SignUpForm = ({setRadioOption}: any) => {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -172,12 +172,15 @@ const SignUpForm = () => {
     }
 
     try{
-      await axios.post("http://localhost:8080/auth/register", {
+       const response = await axios.post("http://localhost:8080/auth/register", {
         name: fullName,
         email: email,
         password: password
       });
-      alert("Conta criada com sucesso!")
+      if(response.status === 200){
+        setRadioOption("login")
+        alert("Conta criada com sucesso!")
+      }
     }catch(error){
       setError("Erro ao se registrar")
     }
@@ -217,7 +220,6 @@ const SignUpForm = () => {
 
 const Login = () => {
   const [radioOption, setRadioOption] = useState("login");
-
 
   const onchange = ({ target: { value } }: RadioChangeEvent) => {
     setRadioOption(value);
@@ -268,7 +270,7 @@ const Login = () => {
                   </Radio.Group>
                 </Space>
               </div>
-              {radioOption === "login" ? <LoginForm /> : <SignUpForm />}
+              {radioOption === "login" ? <LoginForm /> : <SignUpForm setRadioOption={setRadioOption}/>}
             </div>
           </Col>
         </Row>
