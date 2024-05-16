@@ -39,7 +39,6 @@ const ViewEvents: React.FC  = () => {
 
     const handleConfirm = () => {
         console.log("Dados para submissão:", currentEvent);
-        // Lógica para submeter os dados atualizados
         setModalOpen(false);
     };
 
@@ -118,37 +117,40 @@ const ViewEvents: React.FC  = () => {
     ];
 
     return (
-        <div style={{ padding: 24, minHeight: 360, background: '#fff' }}>
-            <h1 style={{ textAlign: "center", marginBottom: "1.5rem" }}>Visualizar eventos</h1>
-            <Table dataSource={events} columns={columns} rowKey="id" />
-            {currentEvent && (
-                <GenericModal
-                    isOpen={modalOpen}
-                    toggle={() => setModalOpen(false)}
-                    title="Editar Evento"
-                    onConfirm={handleConfirm}
-                    confirmText="Salvar"
-                    cancelText="Cancelar"
-                >
-                    <Form layout="vertical" initialValues={currentEvent} onValuesChange={handleFormChange}>
-                        <Form.Item label="Título" name="title">
-                            <Input />
-                        </Form.Item>
-                        <Form.Item label="Descrição" name="description">
-                            <Input />
-                        </Form.Item>
-                        <Form.Item label="Início" name="startDate">
-                            <DatePicker showTime />
-                        </Form.Item>
-                        <Form.Item label="Fim" name="endDate">
-                            <DatePicker showTime />
-                        </Form.Item>
+        <div className='container'>
+            <div style={{ padding: 24, minHeight: 360, background: '#fff' }}>
+                <h1 style={{ textAlign: "center", marginBottom: "1.5rem" }}>Visualizar eventos</h1>
+                <Table dataSource={events} columns={columns} rowKey="id" />
+                {currentEvent && (
+                    <GenericModal
+                        isOpen={modalOpen}
+                        toggle={() => setModalOpen(false)}
+                        title="Editar Evento"
+                        onConfirm={handleConfirm}
+                        confirmText="Salvar"
+                        cancelText="Cancelar"
+                    >
+                        <Form layout="vertical" initialValues={currentEvent} onValuesChange={handleFormChange}>
+                            <Form.Item label="Título" name="title">
+                                <Input />
+                            </Form.Item>
+                            <Form.Item label="Descrição" name="description">
+                                <Input />
+                            </Form.Item>
+                            <Form.Item label="Início" name="startDate">
+                                <DatePicker showTime />
+                            </Form.Item>
+                            <Form.Item label="Fim" name="endDate">
+                                <DatePicker showTime />
+                            </Form.Item>
 
 
-                    </Form>
-                </GenericModal>
-            )}
+                        </Form>
+                    </GenericModal>
+                )}
+            </div>
         </div>
+
     );
 };
 
