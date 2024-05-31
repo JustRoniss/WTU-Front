@@ -7,6 +7,7 @@ import moment, { MomentInput } from 'moment';
 import { Event } from './../../../interfaces/Event';
 import { User } from '../../../interfaces/User';
 import { Unit } from '../../../interfaces/Unit';
+import { ColumnsType } from 'antd/es/table';
 
 const ViewEvents: React.FC = () => {
     const [events, setEvents] = useState<Event[]>([]);
@@ -87,7 +88,7 @@ const ViewEvents: React.FC = () => {
         setCurrentEvent((prev) => prev ? { ...prev, ...allValues, startDate: moment(allValues.startDate), endDate: moment(allValues.endDate) } : null);
     };
 
-    const columns = [
+    const columns:ColumnsType<Event> = [
         {
             title: 'Título',
             dataIndex: 'title',
