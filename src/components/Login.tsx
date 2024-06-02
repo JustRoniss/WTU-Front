@@ -2,7 +2,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { useRive } from "@rive-app/react-canvas";
 import axios from 'axios'
 import "./../styles/login.css";
-import { Radio, RadioChangeEvent, Space } from "antd";
+import { Radio, RadioChangeEvent, Select, Space } from "antd";
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './../security/AuthProvider';
 import {
@@ -19,6 +19,8 @@ import {
   ModalFooter,
   Label
 } from "reactstrap";
+import { Unit } from "../interfaces/Unit";
+import api from "../../axiosConfig";
 
 
 const LoginForm = () => {
@@ -67,24 +69,6 @@ const doRedirect = (token: string) => {
     navigate("/login");
   }
 }
-
-// useEffect(() => {
-//   const token = localStorage.getItem('token'); 
-//   if (token) {
-//     const role = getRoleFromToken(token);
-//     switch (role) {
-//       case 'ADMIN':
-//         navigate('/admin');
-//         break;
-//       case 'USER':
-//         navigate('/home');
-//         break;
-//       default:
-//         navigate('/login');
-//         break;
-//     }
-//   }
-// }, [navigate, getRoleFromToken]); 
 
 
   return (
@@ -149,6 +133,21 @@ const SignUpForm = ({setRadioOption}: any) => {
   const [password, setPassword] = useState('');
   const [repeatPassword, setRepeatPassword] = useState('');
   const [error, setError] = useState('');
+  const [units, setUnits] = useState<Unit[]>([]);
+  const [selectedUnit, setSelectedUnit] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchUnits = async () => {
+      try {
+        const response = await api.get<Unit[]>('/units/get-all');
+        setUnits(response.data);
+      } catch (error) {
+        console.error("Erro ao buscar unidades:", error);
+      }
+    };
+
+    fetchUnits();
+  }, []);
 
 
   const validatePassword = (password: string): boolean => {
@@ -175,7 +174,9 @@ const SignUpForm = ({setRadioOption}: any) => {
        const response = await axios.post("http://localhost:8080/auth/register", {
         name: fullName,
         email: email,
-        password: password
+        password: password,
+        unitId: selectedUnit
+
       });
       if(response.status === 200){
         setRadioOption("login")
@@ -210,6 +211,23 @@ const SignUpForm = ({setRadioOption}: any) => {
           {error && <div style={{ color: 'red', marginTop: '10px' }}>{error}</div>}
         </div>
       </div>
+
+      <div className="full-width-center">
+        <Label for="unitSelect">Selecione sua unidade</Label>
+        <Select
+          id="unitSelect"
+          style={{ width: '100%' }}
+          placeholder="Selecione a unidade"
+          onChange={(value) => setSelectedUnit(value)}
+        >
+          {units.map(unit => (
+            <Select.Option key={unit.id} value={unit.id}>
+              {unit.name}
+            </Select.Option>
+          ))}
+        </Select>
+      </div>
+
       <div className='button-container'>
         <Button type="submit" color="primary" className="button-53 heartbeat w-100 mt-5">Criar conta</Button>
       </div>

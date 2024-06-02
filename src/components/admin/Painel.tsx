@@ -19,7 +19,7 @@ const items = [
 ];
 
 const Painel = () => {
-    const [collapsed, setCollapsed] = useState(true);
+    const [collapsed, setCollapsed] = useState(false);
 
     return (
         <Layout style={{ minHeight: '100vh' }}>
