@@ -20,7 +20,7 @@ import {
   Label
 } from "reactstrap";
 import { Unit } from "../interfaces/Unit";
-import api from "../config/axiosConfig";
+import api from "../../axiosConfig";
 
 
 const LoginForm = () => {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Input, Button, DatePicker, Select, TimePicker, ConfigProvider } from 'antd';
 import moment from 'moment';
-import api from '../../../config/axiosConfig';
+import api from '../../../../axiosConfig';
 import './../../../styles/createEvents.css';
 import locale from 'antd/lib/locale/pt_BR';
 import {EventFormValues} from './../../../interfaces/EventFormValues'

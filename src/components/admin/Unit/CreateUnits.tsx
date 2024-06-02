@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Form, Input, Button, ConfigProvider, Select } from 'antd';
-import api from '../../../config/axiosConfig';
+import api from '../../../../axiosConfig';
 import locale from 'antd/lib/locale/pt_BR';
 
 const CreateUnits: React.FC = () => {

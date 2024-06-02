@@ -1,10 +1,10 @@
 import axios from 'axios';
 
+const baseURL = import.meta.env.VITE_REACT_APP_BACKEND_URL || 'http://localhost:8080';
 
 const api = axios.create({
-    baseURL: 'http://localhost:8080'  
+    baseURL: baseURL
 });
-
 
 api.interceptors.request.use(
     config => {

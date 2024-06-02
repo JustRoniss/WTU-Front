@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { DatePicker, Form, Input, Select, Table } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import api from '../../../config/axiosConfig';
+import api from '../../../../axiosConfig';
 import GenericModal from '../../generics/GenericModal';
 import moment, { MomentInput } from 'moment';
 import { Event } from './../../../interfaces/Event';

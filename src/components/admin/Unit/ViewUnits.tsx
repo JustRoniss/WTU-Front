@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Input, Select, Table } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import api from '../../../config/axiosConfig';
+import api from '../../../../axiosConfig';
 import GenericModal from '../../generics/GenericModal';
 import { User } from '../../../interfaces/User';
 import { Unit } from '../../../interfaces/Unit';
