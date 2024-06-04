@@ -95,14 +95,6 @@ const ViewUnits: React.FC = () => {
             render: (unit: Unit) => (
                 <EditOutlined style={{ color: "blue", cursor: "pointer" }} onClick={() => handleEdit(unit)} />
             ),
-        },
-        {
-            title: 'Remover',
-            key: 'remove',
-            align: 'center',
-            render: (unit: Unit) => (
-                <DeleteOutlined style={{ color: "red", cursor: "pointer" }} onClick={() => handleEdit(unit)} />
-            ),
         }
     ];
 

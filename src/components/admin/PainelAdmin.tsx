@@ -18,7 +18,7 @@ const items = [
     ]},
 ];
 
-const Painel = () => {
+const PainelAdmin = () => {
     const [collapsed, setCollapsed] = useState(false);
 
     return (
@@ -38,4 +38,4 @@ const Painel = () => {
     );
 };
 
-export default Painel;
+export default PainelAdmin;
