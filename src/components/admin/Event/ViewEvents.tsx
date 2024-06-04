@@ -3,7 +3,7 @@ import { DatePicker, Form, Input, Select, Table } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import api from '../../../../axiosConfig';
 import GenericModal from '../../generics/GenericModal';
-import moment, { MomentInput } from 'moment';
+import moment from 'moment';
 import { Event } from './../../../interfaces/Event';
 import { User } from '../../../interfaces/User';
 import { Unit } from '../../../interfaces/Unit';
@@ -15,16 +15,16 @@ const ViewEvents: React.FC = () => {
     const [currentEvent, setCurrentEvent] = useState<Event | null>(null);
     const [units, setUnits] = useState<Unit[]>([]);
     const [users, setUsers] = useState<User[]>([]);
+    const [selectedUnits, setSelectedUnits] = useState<number[]>([]);
+    const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+    const [loadingUsers, setLoadingUsers] = useState<boolean>(true);
     const { RangePicker } = DatePicker;
-    const [selectUnit, setSelectUnit] = useState([]);
-
-    console.log(selectUnit)
 
     useEffect(() => {
         const fetchEvents = async () => {
             try {
                 const response = await api.get<Event[]>('/events/get-all');
-                const formattedEvents: Event[] = response.data.map((event) => ({
+                const formattedEvents: Event[] = response.data.map(event => ({
                     ...event,
                     startDate: moment(event.startDate),
                     endDate: moment(event.endDate)
@@ -39,7 +39,6 @@ const ViewEvents: React.FC = () => {
             try {
                 const response = await api.get<Unit[]>('/units/get-all');
                 setUnits(response.data);
-                console.log("O que veio de uniudade : " + response.data)
             } catch (error) {
                 console.error('Erro ao buscar unidades:', error);
             }
@@ -49,8 +48,10 @@ const ViewEvents: React.FC = () => {
             try {
                 const response = await api.get<User[]>('/users/get-all');
                 setUsers(response.data);
+                setLoadingUsers(false);
             } catch (error) {
                 console.error('Erro ao buscar usuários:', error);
+                setLoadingUsers(false);
             }
         };
 
@@ -60,18 +61,32 @@ const ViewEvents: React.FC = () => {
     }, []);
 
     const handleEdit = (event: Event) => {
+
+        console.log(selectedUnits)
         setCurrentEvent({
             ...event,
+            id: event.id,
             startDate: moment(event.startDate),
             endDate: moment(event.endDate),
         });
+
+        setSelectedUnits(event.units.map(unit => unit.id));
+        setSelectedUsers(event.users.map(user => user.email));
         setModalOpen(true);
     };
 
     const handleConfirm = async () => {
         if (currentEvent && currentEvent.id) {
             try {
-                const response = await api.put(`/events/edit/${currentEvent.id}`, currentEvent);
+                const response = await api.put(`/events/edit/${currentEvent.id}`, {
+                    title: currentEvent.title,
+                    description: currentEvent.description,
+                    startDate: currentEvent.startDate,
+                    endDate: currentEvent.endDate,
+                    iframe: currentEvent.iframe,
+                    units: selectedUnits.map(id => ({ id })), 
+                    users: selectedUsers.map(email => ({ email }))  
+                });
                 alert("Evento atualizado com sucesso");
                 setModalOpen(false);
                 setEvents(prevEvents => prevEvents.map(event => event.id === currentEvent.id ? { ...currentEvent, ...response.data } : event));
@@ -85,10 +100,16 @@ const ViewEvents: React.FC = () => {
     };
 
     const handleFormChange = (changedValues: any, allValues: any) => {
-        setCurrentEvent((prev) => prev ? { ...prev, ...allValues, startDate: moment(allValues.startDate), endDate: moment(allValues.endDate) } : null);
+        if (allValues.units) {
+            setSelectedUnits(allValues.units);
+        }
+        if (allValues.users) {
+            setSelectedUsers(allValues.users);
+        }
+        setCurrentEvent(prev => prev ? { ...prev, ...allValues, startDate: moment(allValues.startDate), endDate: moment(allValues.endDate) } : null);
     };
 
-    const columns:ColumnsType<Event> = [
+    const columns: ColumnsType<Event> = [
         {
             title: 'Título',
             dataIndex: 'title',
@@ -107,14 +128,7 @@ const ViewEvents: React.FC = () => {
             key: 'startDate',
             align: 'center',
             render: (startDate: string | number | Date) => {
-                return new Date(startDate).toLocaleString('pt-BR', {
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit'
-                });
+                return moment(startDate).format('DD/MM/YYYY, HH:mm:ss');
             },
         },
         {
@@ -123,14 +137,7 @@ const ViewEvents: React.FC = () => {
             key: 'endDate',
             align: 'center',
             render: (endDate: string | number | Date) => {
-                return new Date(endDate).toLocaleString('pt-BR', {
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit'
-                });
+                return moment(endDate).format('DD/MM/YYYY, HH:mm:ss');
             },
         },
         {
@@ -193,7 +200,7 @@ const ViewEvents: React.FC = () => {
                         confirmText="Salvar"
                         cancelText="Cancelar"
                     >
-                        <Form layout="vertical" initialValues={currentEvent} onValuesChange={handleFormChange}>
+                        <Form layout="vertical" initialValues={{ ...currentEvent, units: selectedUnits, users: selectedUsers }} onValuesChange={handleFormChange}>
                             <Form.Item label="Título" name="title">
                                 <Input />
                             </Form.Item>
@@ -213,21 +220,25 @@ const ViewEvents: React.FC = () => {
                             <Form.Item label="Unidades" name="units">
                                 <Select
                                     mode='multiple'
-                                    value={selectUnit}
                                     placeholder="Selecione as unidades"
+                                    onChange={setSelectedUnits}
                                 >
                                     {units.map(unit => (
-                                        <Select.Option key={unit.id} value={unit.isFranchised}>
+                                        <Select.Option key={unit.id} value={unit.id}>
                                             {unit.name}
                                         </Select.Option>
                                     ))}
                                 </Select>
                             </Form.Item>
 
-                            <Form.Item label="Usuários" name="userEmails">
-                                <Select mode='multiple' placeholder="Selecione os usuários" defaultValue={currentEvent.userEmails}>
+                            <Form.Item label="Usuários" name="users">
+                                <Select
+                                    mode='multiple'
+                                    placeholder="Selecione os usuários"
+                                    onChange={setSelectedUsers}
+                                >
                                     {users.map(user => (
-                                        <Select.Option key={user.id} value={user.email}>
+                                        <Select.Option key={user.email} value={user.email}>
                                             {user.email}
                                         </Select.Option>
                                     ))}

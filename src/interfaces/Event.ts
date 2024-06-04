@@ -6,7 +6,7 @@ export interface Event {
     description: string;
     startDate: moment.Moment;
     endDate: moment.Moment;
-    units: { name: string }[];
-    userEmails: string[];
+    units: { id: number, name: string }[];
+    users: { email: string }[];
     iframe: string;
 }
