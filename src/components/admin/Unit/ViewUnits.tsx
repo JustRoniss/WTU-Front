@@ -9,11 +9,9 @@ import { ColumnsType } from 'antd/es/table';
 
 const ViewUnits: React.FC = () => {
     const [units, setUnits] = useState<Unit[]>([]);
-    const [users, setUsers] = useState<User[]>([]);
     const [modalOpen, setModalOpen] = useState<boolean>(false);
     const [currentUnit, setCurrentUnit] = useState<Unit | null>(null);
     const [loadingUnits, setLoadingUnits] = useState<boolean>(true);
-    const [loadingUsers, setLoadingUsers] = useState<boolean>(true);
 
     useEffect(() => {
         const fetchUnits = async () => {
@@ -26,34 +24,26 @@ const ViewUnits: React.FC = () => {
                 setLoadingUnits(false);
             }
         };
-
-        const fetchUsers = async () => {
-            try {
-                const response = await api.get<User[]>('/users/get-all');
-                setUsers(response.data);
-                setLoadingUsers(false);
-            } catch (error) {
-                console.error('Erro ao buscar usuários:', error);
-                setLoadingUsers(false);
-            }
-        };
-
         fetchUnits();
-        fetchUsers();
     }, []);
 
     const handleEdit = (unit: Unit) => {
-        setCurrentUnit(unit);
+        setCurrentUnit({ ...unit });
         setModalOpen(true);
     };
 
     const handleConfirm = async () => {
         if (currentUnit && currentUnit.id) {
             try {
-                const response = await api.put(`/units/edit/${currentUnit.id}`, currentUnit);
+                const payload = {
+                    name: currentUnit.name,
+                    endereco: currentUnit.endereco,
+                    franchised: currentUnit.isFranchised
+                };
+                const response = await api.put(`/units/edit/${currentUnit.id}`, payload);
                 alert("Unidade atualizada com sucesso");
                 setModalOpen(false);
-                setUnits(prevUnits => prevUnits.map(unit => unit.id === currentUnit.id ? { ...currentUnit, ...response.data } : unit));
+                setUnits(prevUnits => prevUnits.map(unit => unit.id === currentUnit.id ? { ...unit, ...response.data } : unit));
             } catch (error) {
                 alert("Erro ao atualizar a unidade");
                 console.error('Erro ao atualizar a unidade:', error);
@@ -64,11 +54,12 @@ const ViewUnits: React.FC = () => {
     };
 
     const handleFormChange = (changedValues: any, allValues: any) => {
-        const updatedUsers = users.filter(user => allValues.users.includes(user.email));
-        setCurrentUnit((prev) => prev ? { ...prev, ...allValues, users: updatedUsers } : null);
+        console.log("Changed Values:", changedValues);
+        console.log("All Values:", allValues);
+        setCurrentUnit(prev => prev ? { ...prev, ...changedValues } : null);
     };
 
-    const columns: ColumnsType<Unit>  = [
+    const columns: ColumnsType<Unit> = [
         {
             title: 'Nome',
             dataIndex: 'name',
@@ -121,27 +112,13 @@ const ViewUnits: React.FC = () => {
                                 <Input />
                             </Form.Item>
 
-                            <Form.Item label="Franquia" name="franchised">
+                            <Form.Item label="Franquia" name="isFranchised">
                                 <Select>
                                     <Select.Option value={true}>Sim</Select.Option>
                                     <Select.Option value={false}>Não</Select.Option>
                                 </Select>
                             </Form.Item>
 
-                            <Form.Item label="Usuários" name="users">
-                                <Select
-                                    mode='multiple'
-                                    placeholder="Selecione os usuários"
-                                    defaultValue={users.filter(user => user.unit?.id === currentUnit.id).map(user => user.email)}
-                                    loading={loadingUsers}
-                                >
-                                    {users.map(user => (
-                                        <Select.Option key={user.id} value={user.email}>
-                                            {user.email}
-                                        </Select.Option>
-                                    ))}
-                                </Select>
-                            </Form.Item>
                         </Form>
                     </GenericModal>
                 )}
