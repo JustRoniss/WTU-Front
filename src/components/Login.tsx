@@ -64,7 +64,7 @@ const doRedirect = (token: string) => {
   if (role === 'ADMIN') {
     navigate("/admin");
   } else if (role === 'USER') {
-    navigate("/home");
+    navigate("/user/");
   } else {
     navigate("/login");
   }

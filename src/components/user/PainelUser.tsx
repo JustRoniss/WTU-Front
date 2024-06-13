@@ -8,7 +8,7 @@ const { Header, Content, Footer, Sider } = Layout;
 
 const items = [   
     { label: 'Eventos', key: 'eventos', icon: <TeamOutlined />, children: [
-        { label: (<Link to="/admin/view-events">Meus eventos</Link>),icon: <EyeOutlined />  ,key: 'visualizar-eventos' },
+        { label: (<Link to="/user/view-events">Meus eventos</Link>),icon: <EyeOutlined />  ,key: 'visualizar-eventos' },
     ]},
 ];
 
