@@ -17,6 +17,7 @@ import ViewUnits from './components/admin/Unit/ViewUnits'
 //User imports
 
 import PainelUser from './components/user/PainelUser';
+import UserEvents from './components/user/Event/UserEvents';
 
 
 const App: React.FC = () => {
@@ -36,7 +37,7 @@ const App: React.FC = () => {
           </Route>
 
           <Route path="/user/*" element={<ProtectedRoute roles={['USER']} element={<PainelUser />} />}> 
-
+            <Route path='view-events' element={<UserEvents/>}></Route>
           </Route>
 
         </Routes>
