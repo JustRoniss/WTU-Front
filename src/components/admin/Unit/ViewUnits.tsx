@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Input, Select, Table } from 'antd';
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { EditOutlined } from '@ant-design/icons';
 import api from '../../../../axiosConfig';
 import GenericModal from '../../generics/GenericModal';
-import { User } from '../../../interfaces/User';
 import { Unit } from '../../../interfaces/Unit';
 import { ColumnsType } from 'antd/es/table';
 
@@ -12,6 +11,7 @@ const ViewUnits: React.FC = () => {
     const [modalOpen, setModalOpen] = useState<boolean>(false);
     const [currentUnit, setCurrentUnit] = useState<Unit | null>(null);
     const [loadingUnits, setLoadingUnits] = useState<boolean>(true);
+    const [form] = Form.useForm();
 
     useEffect(() => {
         const fetchUnits = async () => {
@@ -24,26 +24,34 @@ const ViewUnits: React.FC = () => {
                 setLoadingUnits(false);
             }
         };
+
+       
+
         fetchUnits();
     }, []);
 
     const handleEdit = (unit: Unit) => {
-        setCurrentUnit({ ...unit });
+        setCurrentUnit(unit);
         setModalOpen(true);
+        form.setFieldsValue({
+            ...unit
+        });
     };
 
     const handleConfirm = async () => {
-        if (currentUnit && currentUnit.id) {
+        if (currentUnit && currentUnit.id){
             try {
-                const payload = {
-                    name: currentUnit.name,
-                    endereco: currentUnit.endereco,
-                    franchised: currentUnit.isFranchised
+                const updatedValues = await form.validateFields();
+                
+                const updatedUnit = {
+                    ...currentUnit,
+                    ...updatedValues
                 };
-                const response = await api.put(`/units/edit/${currentUnit.id}`, payload);
+                console.log(updatedUnit)
+                const response = await api.put(`/units/edit/${updatedUnit.id}`, updatedUnit);
                 alert("Unidade atualizada com sucesso");
                 setModalOpen(false);
-                setUnits(prevUnits => prevUnits.map(unit => unit.id === currentUnit.id ? { ...unit, ...response.data } : unit));
+                setUnits(prevUnits => prevUnits.map(unit => unit.id === updatedUnit.id ? { ...updatedUnit, ...response.data } : unit));
             } catch (error) {
                 alert("Erro ao atualizar a unidade");
                 console.error('Erro ao atualizar a unidade:', error);
@@ -51,15 +59,10 @@ const ViewUnits: React.FC = () => {
         } else {
             alert("Erro: Unidade atual não possui um ID válido.");
         }
+       
     };
 
-    const handleFormChange = (changedValues: any, allValues: any) => {
-        console.log("Changed Values:", changedValues);
-        console.log("All Values:", allValues);
-        setCurrentUnit(prev => prev ? { ...prev, ...changedValues } : null);
-    };
-
-    const columns: ColumnsType<Unit> = [
+    const columns: ColumnsType<Unit>  = [
         {
             title: 'Nome',
             dataIndex: 'name',
@@ -74,8 +77,8 @@ const ViewUnits: React.FC = () => {
         },
         {
             title: 'Franquia',
-            dataIndex: 'isFranchised',
-            key: 'isFranchised',
+            dataIndex: 'franchised',
+            key: 'franchised',
             align: 'center',
             render: (isFranchised: boolean) => isFranchised ? 'Sim' : 'Não'
         },
@@ -103,7 +106,7 @@ const ViewUnits: React.FC = () => {
                         confirmText="Salvar"
                         cancelText="Cancelar"
                     >
-                        <Form layout="vertical" initialValues={currentUnit} onValuesChange={handleFormChange}>
+                        <Form layout="vertical" form={form} initialValues={currentUnit}>
                             <Form.Item label="Nome" name="name">
                                 <Input />
                             </Form.Item>
@@ -112,13 +115,13 @@ const ViewUnits: React.FC = () => {
                                 <Input />
                             </Form.Item>
 
-                            <Form.Item label="Franquia" name="isFranchised">
+                            <Form.Item label="Franquia" name="franchised">
                                 <Select>
                                     <Select.Option value={true}>Sim</Select.Option>
                                     <Select.Option value={false}>Não</Select.Option>
                                 </Select>
                             </Form.Item>
-
+                    
                         </Form>
                     </GenericModal>
                 )}
