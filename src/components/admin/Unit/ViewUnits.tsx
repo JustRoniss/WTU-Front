@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Input, Select, Table } from 'antd';
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { EditOutlined } from '@ant-design/icons';
 import api from '../../../../axiosConfig';
 import GenericModal from '../../generics/GenericModal';
 import { Unit } from '../../../interfaces/Unit';
@@ -38,16 +38,7 @@ const ViewUnits: React.FC = () => {
         });
     };
 
-    const handleDelete = async (unitId: number) => {
-        try {
-            await api.delete(`/units/delete/${unitId}`);
-            alert("Unidade removida com sucesso");
-            setUnits(prevUnits => prevUnits.filter(unit => unit.id !== unitId));
-        } catch (error) {
-            alert("Erro ao remover a unidade");
-            console.error('Erro ao remover a unidade:', error);
-        }
-    };
+    
 
     const handleConfirm = async () => {
         if (currentUnit && currentUnit.id){
@@ -100,14 +91,7 @@ const ViewUnits: React.FC = () => {
                 <EditOutlined style={{ color: "blue", cursor: "pointer" }} onClick={() => handleEdit(unit)} />
             ),
         },
-        {
-            title: 'Remover',
-            key: 'remove',
-            align: 'center',
-            render: (unit: Unit) => (
-                <DeleteOutlined style={{ color: "red", cursor: "pointer" }} onClick={() => handleDelete(unit.id)} />
-            ),
-        }
+        
     ];
 
     return (
