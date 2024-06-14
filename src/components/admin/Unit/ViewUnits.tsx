@@ -38,6 +38,8 @@ const ViewUnits: React.FC = () => {
         });
     };
 
+    
+
     const handleConfirm = async () => {
         if (currentUnit && currentUnit.id){
             try {
@@ -59,7 +61,6 @@ const ViewUnits: React.FC = () => {
         } else {
             alert("Erro: Unidade atual não possui um ID válido.");
         }
-       
     };
 
     const columns: ColumnsType<Unit>  = [
@@ -89,7 +90,8 @@ const ViewUnits: React.FC = () => {
             render: (unit: Unit) => (
                 <EditOutlined style={{ color: "blue", cursor: "pointer" }} onClick={() => handleEdit(unit)} />
             ),
-        }
+        },
+        
     ];
 
     return (
