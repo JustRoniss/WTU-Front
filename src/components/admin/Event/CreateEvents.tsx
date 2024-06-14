@@ -10,6 +10,7 @@ import { User } from './../../../interfaces/User';
 import { UnitDTO } from '../../../interfaces/dto/UnitDTO';
 import { UserDTO } from '../../../interfaces/dto/UserDTO';
 
+
 moment.locale('pt-br');
 
 const CreateEvents: React.FC = () => {
@@ -17,6 +18,8 @@ const CreateEvents: React.FC = () => {
     const [users, setUsers] = useState<User[]>([]);
     const [loadingUnits, setLoadingUnits] = useState<boolean>(true);
     const [loadingUsers, setLoadingUsers] = useState<boolean>(true);
+    const [form] = Form.useForm();
+
 
     useEffect(() => {
         const fetchUnits = async () => {
@@ -45,6 +48,15 @@ const CreateEvents: React.FC = () => {
         fetchUsers();
     }, []);
 
+    const validateFinish = (value: any) => {
+        const unit = form.getFieldValue("unit");
+        const usersEmail = form.getFieldValue("users");
+        if((!unit || unit.length === 0) && (!usersEmail || usersEmail.length === 0)){
+            return Promise.reject("Informe pelo menos uma unidade ou um usuário");
+        }
+        return Promise.resolve();
+    }
+
     const onFinish = (values: EventFormValues) => {
         const { startDate, startTime, endDate, endTime, title, description, unit, usersEmail, iframe } = values;
 
@@ -58,8 +70,14 @@ const CreateEvents: React.FC = () => {
             minute: endTime.minute(),
         });
 
-        const selectedUnits: UnitDTO[] = units.filter(u => unit.includes(u.id)).map(u => ({ id: u.id }));
-        const selectedUsers: UserDTO[] = users.filter(u => usersEmail.includes(u.email)).map(u => ({ email: u.email }));
+        
+        
+        const selectedUnits: UnitDTO[] = units.filter(u => unit && unit.includes(u.id)).map(u => ({ id: u.id }));
+       
+        
+        const selectedUsers: UserDTO[] = users.filter(u =>usersEmail && usersEmail.includes(u.email)).map(u => ({ email: u.email }));
+        
+            
 
         const event = {
             title,
@@ -75,6 +93,7 @@ const CreateEvents: React.FC = () => {
             .then(response => {
                 console.log('Evento criado:', response.data);
                 alert('Evento criado com sucesso!');
+                form.resetFields();
             })
             .catch(error => {
                 console.error('Erro ao criar evento:', error);
@@ -87,7 +106,7 @@ const CreateEvents: React.FC = () => {
             <div className='container'>
                 <h1 className='title'>Criar eventos</h1>
                 <div style={{ display: "flex", justifyContent: "center" }}>
-                    <Form onFinish={onFinish}>
+                    <Form onFinish={onFinish} form={form}>
                         <Form.Item
                             name="title"
                             rules={[{ required: true, message: 'Por favor insira o título do evento.' }]}
@@ -130,7 +149,10 @@ const CreateEvents: React.FC = () => {
                         <div className='input-group-horizontal'>
                             <Form.Item
                                 name="unit"
-                                rules={[{ required: false, message: '' }]}
+                                rules={[
+                                    {required: false},
+                                    {validator: validateFinish}
+                                ]}
                             >
                                 <Select
                                     mode='multiple'
@@ -145,7 +167,10 @@ const CreateEvents: React.FC = () => {
                             </Form.Item>
                             <Form.Item
                                 name="usersEmail"
-                                rules={[{ required: false, message: '' }]}
+                                rules={[
+                                    {required: false},
+                                    {validator: validateFinish}
+                                ]}
                             >
                                 <Select
                                     mode='multiple'

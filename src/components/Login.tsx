@@ -168,23 +168,24 @@ const SignUpForm = ({setRadioOption}: any) => {
     } else if (!validatePassword(password)){
       setError('A senha deve conter ao menos 8 caracteres, incluindo números, letras maiúsculas, letras minúsculas e caracteres especiais.');
       return;
+    }else if(password == repeatPassword){
+      try{
+        const response = await axios.post("http://localhost:8080/auth/register", {
+         name: fullName,
+         email: email,
+         password: password,
+         unitId: selectedUnit
+ 
+       });
+       if(response.status === 200){
+         setRadioOption("login")
+         alert("Conta criada com sucesso!")
+       }
+     }catch(error){
+       setError("Erro ao se registrar")
+     }
     }
-
-    try{
-       const response = await axios.post("http://localhost:8080/auth/register", {
-        name: fullName,
-        email: email,
-        password: password,
-        unitId: selectedUnit
-
-      });
-      if(response.status === 200){
-        setRadioOption("login")
-        alert("Conta criada com sucesso!")
-      }
-    }catch(error){
-      setError("Erro ao se registrar")
-    }
+    
 
   };
   return (
