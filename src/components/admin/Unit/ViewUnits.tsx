@@ -5,6 +5,7 @@ import api from '../../../../axiosConfig';
 import GenericModal from '../../generics/GenericModal';
 import { Unit } from '../../../interfaces/Unit';
 import { ColumnsType } from 'antd/es/table';
+import { showNotification } from '../../generics/GenericNotification';
 
 const ViewUnits: React.FC = () => {
     const [units, setUnits] = useState<Unit[]>([]);
@@ -49,17 +50,17 @@ const ViewUnits: React.FC = () => {
                     ...currentUnit,
                     ...updatedValues
                 };
-                console.log(updatedUnit)
+
                 const response = await api.put(`/units/edit/${updatedUnit.id}`, updatedUnit);
-                alert("Unidade atualizada com sucesso");
+                showNotification("success", "Unidade atualizada", "Unidade atualizada com sucesso!");
                 setModalOpen(false);
                 setUnits(prevUnits => prevUnits.map(unit => unit.id === updatedUnit.id ? { ...updatedUnit, ...response.data } : unit));
             } catch (error) {
-                alert("Erro ao atualizar a unidade");
+                showNotification("error", "Erro ao atualizar unidade", "Houve um erro ao atualizar a unidade. Entre em contato com nossa equipe de desenvolvimento");
                 console.error('Erro ao atualizar a unidade:', error);
             }
         } else {
-            alert("Erro: Unidade atual não possui um ID válido.");
+            showNotification("warning", "Erro", "A unidade não possuí um ID válido. Entre em contato com nossa equipe de desenvolvimento");
         }
     };
 

@@ -9,6 +9,7 @@ import { Unit } from './../../../interfaces/Unit';
 import { User } from './../../../interfaces/User';
 import { UnitDTO } from '../../../interfaces/dto/UnitDTO';
 import { UserDTO } from '../../../interfaces/dto/UserDTO';
+import { showNotification } from '../../generics/GenericNotification';
 
 
 moment.locale('pt-br');
@@ -91,13 +92,12 @@ const CreateEvents: React.FC = () => {
 
         api.post('/events/create', event)
             .then(response => {
-                console.log('Evento criado:', response.data);
-                alert('Evento criado com sucesso!');
+                showNotification("success", "Evento criado", "Evento criado com sucesso!")
                 form.resetFields();
             })
             .catch(error => {
                 console.error('Erro ao criar evento:', error);
-                alert('Erro ao criar evento!');
+                showNotification("error", "Erro ao criar evento", error)
             });
     };
 
