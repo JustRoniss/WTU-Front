@@ -1,13 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { Table } from 'antd';
+import { Button, Table } from 'antd';
 import api from '../../../../axiosConfig';
 import moment from 'moment';
 import { Event } from '../../../interfaces/Event';
 import { ColumnsType } from 'antd/es/table';
+import { useAuth } from '../../../security/AuthProvider';
+import { useNavigate } from 'react-router-dom';
 
 const UserEvents: React.FC = () => {
     const [events, setEvents] = useState<Event[]>([]);
-    const userEmail = "teste2@teste.com"; 
+    const { getEmailFromToken } = useAuth();
+    const navigate = useNavigate();
+
+    const userEmail = getEmailFromToken();
 
     useEffect(() => {
         const fetchEvents = async () => {
@@ -26,6 +31,10 @@ const UserEvents: React.FC = () => {
 
         fetchEvents();
     }, [userEmail]);
+
+    const handleEnterClick = (event: Event) => {
+        navigate(`/user/events/${event.id}/iframe`, { state: { iframe: event.iframe } });
+    };
 
     const columns: ColumnsType<Event> = [
         {
@@ -57,6 +66,16 @@ const UserEvents: React.FC = () => {
             render: (endDate: string | number | Date) => {
                 return moment(endDate).format('DD/MM/YYYY, HH:mm:ss');
             },
+        },
+        {
+            title: 'Ações',
+            key: 'actions',
+            align: 'center',
+            render: (_, record: Event) => (
+                <Button type="primary" onClick={() => handleEnterClick(record)}>
+                    Entrar
+                </Button>
+            )
         }
     ];
 
