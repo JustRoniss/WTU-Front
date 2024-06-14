@@ -61,7 +61,6 @@ const ViewEvents: React.FC = () => {
     }, []);
 
     const handleEdit = (event: Event) => {
-
         console.log(selectedUnits)
         setCurrentEvent({
             ...event,
@@ -73,6 +72,17 @@ const ViewEvents: React.FC = () => {
         setSelectedUnits(event.units.map(unit => unit.id));
         setSelectedUsers(event.users.map(user => user.email));
         setModalOpen(true);
+    };
+
+    const handleDelete = async (eventId: number) => {
+        try {
+            await api.delete(`/events/delete/${eventId}`);
+            alert("Evento removido com sucesso");
+            setEvents(prevEvents => prevEvents.filter(event => event.id !== eventId));
+        } catch (error) {
+            alert("Erro ao remover o evento");
+            console.error('Erro ao remover o evento:', error);
+        }
     };
 
     const handleConfirm = async () => {
@@ -181,7 +191,7 @@ const ViewEvents: React.FC = () => {
             key: 'remove',
             align: 'center',
             render: (event: Event) => (
-                <DeleteOutlined style={{ color: "red", cursor: "pointer" }} onClick={() => handleEdit(event)} />
+                <DeleteOutlined style={{ color: "red", cursor: "pointer" }} onClick={() => handleDelete(event.id)} />
             ),
         }
     ];
