@@ -5,6 +5,7 @@ import {jwtDecode} from 'jwt-decode';
 interface AuthToken {
   exp: number;
   roles: string;
+  sub: string;
 }
 
 interface AuthContextType {
@@ -13,14 +14,10 @@ interface AuthContextType {
   signOut: () => void;
   isAuthenticated: () => boolean;
   hasRole: (role: string) => boolean;
-  getRoleFromToken: (token: string) => string | null; 
+  getRoleFromToken: (token: string) => string | null;
+  getEmailFromToken: () => string | null; 
 }
 
-// interface DecodedToken{
-//   roles?: string;
-//   exp?: number;
-//   iat?: number;
-// }
 
 const AuthContext = createContext<AuthContextType>(null!);
 
@@ -72,8 +69,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const getEmailFromToken = (): string | null => {
+    if(!token) return null;
+    try{
+      const decoded: AuthToken = jwtDecode(token);
+      return decoded.sub;
+    }catch(error){
+        console.error('Failed to decode token: ', error)
+        return null;
+    }
+  }
+ 
   return (
-    <AuthContext.Provider value={{ token, signIn, signOut, isAuthenticated, hasRole, getRoleFromToken }}>
+    <AuthContext.Provider value={{ token, signIn, signOut, isAuthenticated, hasRole, getRoleFromToken, getEmailFromToken }}>
       {children}
     </AuthContext.Provider>
   );
