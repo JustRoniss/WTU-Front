@@ -9,7 +9,10 @@ import { Unit } from './../../../interfaces/Unit';
 import { User } from './../../../interfaces/User';
 import { UnitDTO } from '../../../interfaces/dto/UnitDTO';
 import { UserDTO } from '../../../interfaces/dto/UserDTO';
+
+import { length } from 'localforage';
 import { showNotification } from '../../generics/GenericNotification';
+
 
 
 moment.locale('pt-br');
@@ -151,7 +154,7 @@ const CreateEvents: React.FC = () => {
                                 name="unit"
                                 rules={[
                                     {required: false},
-                                    {validator: validateFinish}
+                                    {validator: async (_, value) => validateFinish}
                                 ]}
                             >
                                 <Select
@@ -169,7 +172,7 @@ const CreateEvents: React.FC = () => {
                                 name="usersEmail"
                                 rules={[
                                     {required: false},
-                                    {validator: validateFinish}
+                                    {validator: async (_, value) => validateFinish}
                                 ]}
                             >
                                 <Select
@@ -188,6 +191,7 @@ const CreateEvents: React.FC = () => {
                                         label: user.email,
                                         value: user.email
                                     }))}
+
                                 />
                             </Form.Item>
                         </div>
