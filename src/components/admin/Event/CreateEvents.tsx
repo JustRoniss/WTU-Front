@@ -9,7 +9,10 @@ import { Unit } from './../../../interfaces/Unit';
 import { User } from './../../../interfaces/User';
 import { UnitDTO } from '../../../interfaces/dto/UnitDTO';
 import { UserDTO } from '../../../interfaces/dto/UserDTO';
+
 import { length } from 'localforage';
+import { showNotification } from '../../generics/GenericNotification';
+
 
 
 moment.locale('pt-br');
@@ -92,13 +95,12 @@ const CreateEvents: React.FC = () => {
 
         api.post('/events/create', event)
             .then(response => {
-                console.log('Evento criado:', response.data);
-                alert('Evento criado com sucesso!');
+                showNotification("success", "Evento criado", "Evento criado com sucesso!")
                 form.resetFields();
             })
             .catch(error => {
                 console.error('Erro ao criar evento:', error);
-                alert('Erro ao criar evento!');
+                showNotification("error", "Erro ao criar evento", error)
             });
     };
 
@@ -126,7 +128,7 @@ const CreateEvents: React.FC = () => {
                                 name="startDate"
                                 rules={[{ required: true, message: 'Por favor selecione a data de início.' }]}
                             >
-                                <DatePicker placeholder='Data início' />
+                                <DatePicker placeholder='Data início' disabledDate={(current) => current && current < moment().startOf('day')} />
                             </Form.Item>
                             <Form.Item
                                 name="startTime"
@@ -138,13 +140,13 @@ const CreateEvents: React.FC = () => {
                                 name="endDate"
                                 rules={[{ required: true, message: 'Por favor selecione a data de término.' }]}
                             >
-                                <DatePicker placeholder='Data fim' />
+                                <DatePicker placeholder='Data fim'  disabledDate={(current) => current && current < moment().startOf('day')}/>
                             </Form.Item>
                             <Form.Item
                                 name="endTime"
                                 rules={[{ required: true, message: 'Por favor selecione a hora de término.' }]}
                             >
-                                <TimePicker placeholder='Hora fim' />
+                                <TimePicker placeholder='Hora fim'  />
                             </Form.Item>
                         </div>
                         <div className='input-group-horizontal'>

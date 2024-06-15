@@ -23,20 +23,23 @@ const App: React.FC = () => {
     <AuthProvider>
       <Router>
         <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/not-found" element={<NotFound />} />
 
-          <Route path="/admin/*" element={<ProtectedRoute roles={['ADMIN']} element={<PainelAdmin />} />}>
-            <Route path="create-events" element={<CreateEvents />} />
-            <Route path="view-events" element={<ViewEvents />} />
-            <Route path="create-units" element={<CreateUnits />} />
-            <Route path="view-units" element={<ViewUnits />} />
-          </Route>
+          <Route path="/" element={<Login />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/not-found" element={<NotFound />} />
 
-          <Route path="/user/*" element={<ProtectedRoute roles={['USER']} element={<PainelUser />} />}> 
-            <Route path="view-events" element={<UserEvents />} />
-            <Route path="events/:eventId/iframe" element={<EventIframe />} />
-          </Route>
+            <Route path="/admin/*" element={<ProtectedRoute roles={['ADMIN']} element={<PainelAdmin />} />}>
+              <Route path="create-events" element={<CreateEvents />} />
+              <Route path="view-events" element={<ViewEvents />} />
+              <Route path="create-units" element={<CreateUnits />} />
+              <Route path="view-units" element={<ViewUnits />} />
+            </Route>
+
+            <Route path="/user/*" element={<ProtectedRoute roles={['USER']} element={<PainelUser />} />}> 
+              <Route path="view-events" element={<UserEvents />} />
+              <Route path="events/:eventId/iframe" element={<EventIframe />} />
+            </Route>
+
         </Routes>
       </Router>
     </AuthProvider>

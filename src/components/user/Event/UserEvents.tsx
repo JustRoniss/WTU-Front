@@ -33,7 +33,7 @@ const UserEvents: React.FC = () => {
     }, [userEmail]);
 
     const handleEnterClick = (event: Event) => {
-        navigate(`/user/events/${event.id}/iframe`, { state: { iframe: event.iframe } });
+        navigate(`/user/events/${event.id}/iframe`, { state: { iframe: event.iframe, title: event.title } });
     };
 
     const columns: ColumnsType<Event> = [
@@ -71,11 +71,15 @@ const UserEvents: React.FC = () => {
             title: 'Ações',
             key: 'actions',
             align: 'center',
-            render: (_, record: Event) => (
-                <Button type="primary" onClick={() => handleEnterClick(record)}>
-                    Entrar
-                </Button>
-            )
+            render: (_, record: Event) => {
+                const now = moment();
+                const buttonText = record.endDate.isAfter(now) ? 'Entrar' : 'Assistir gravação';
+                return (
+                    <Button type="primary" onClick={() => handleEnterClick(record)}>
+                        {buttonText}
+                    </Button>
+                );
+            }
         }
     ];
 
