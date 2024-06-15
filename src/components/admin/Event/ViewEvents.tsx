@@ -8,6 +8,7 @@ import { Event } from './../../../interfaces/Event';
 import { User } from '../../../interfaces/User';
 import { Unit } from '../../../interfaces/Unit';
 import { ColumnsType } from 'antd/es/table';
+import { showNotification } from '../../generics/GenericNotification';
 
 const ViewEvents: React.FC = () => {
     const [events, setEvents] = useState<Event[]>([]);
@@ -61,7 +62,7 @@ const ViewEvents: React.FC = () => {
     }, []);
 
     const handleEdit = (event: Event) => {
-        console.log(selectedUnits)
+
         setCurrentEvent({
             ...event,
             id: event.id,
@@ -77,10 +78,10 @@ const ViewEvents: React.FC = () => {
     const handleDelete = async (eventId: number) => {
         try {
             await api.delete(`/events/delete/${eventId}`);
-            alert("Evento removido com sucesso");
+            showNotification("success", "Evento removido", "Evento excluído com sucesso!");
             setEvents(prevEvents => prevEvents.filter(event => event.id !== eventId));
         } catch (error) {
-            alert("Erro ao remover o evento");
+            showNotification("error", "Erro ao remover evento", "Não foi possível remover o evento. Entre em contato com nossa equipe de desenvolvimento");
             console.error('Erro ao remover o evento:', error);
         }
     };
@@ -97,15 +98,15 @@ const ViewEvents: React.FC = () => {
                     units: selectedUnits.map(id => ({ id })), 
                     users: selectedUsers.map(email => ({ email }))  
                 });
-                alert("Evento atualizado com sucesso");
+                showNotification("success", "Evento atualizado", "Evento atualizado com sucesso!");
                 setModalOpen(false);
                 setEvents(prevEvents => prevEvents.map(event => event.id === currentEvent.id ? { ...currentEvent, ...response.data } : event));
             } catch (error) {
-                alert("Erro ao atualizar o evento");
+                showNotification("error", "Erro ao atualizar o evento", "Não foi possível atualizar o evento. Entre em contato com nossa equipe de desenvolvimento");
                 console.error('Erro ao atualizar o evento:', error);
             }
         } else {
-            alert("Erro: Evento atual não possui um ID válido.");
+            showNotification("warning", "Erro", "O Evento não possuí um ID válido. Entre em contato com nossa equipe de desenvolvimento");
         }
     };
 

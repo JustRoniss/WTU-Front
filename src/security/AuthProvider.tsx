@@ -50,7 +50,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (!token) return false;
     try {
       const decoded: AuthToken = jwtDecode<AuthToken>(token);
-      console.log("Aqui está o JWT decoded: " +  decoded)
       return decoded.roles === role;
     } catch (error) {
       console.error('Failed to decode JWT', error);
@@ -59,12 +58,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const getRoleFromToken = (token: string): string | null => {
-    console.log("cheguei no get role")
     try{
       const decoded: AuthToken = jwtDecode(token);
       return decoded.roles
     }catch(error){
-      console.log("Error to decode token: ", error)
+      console.error("Error to decode token: ", error)
       return null;
     }
   };
