@@ -21,6 +21,7 @@ import {
 } from "reactstrap";
 import { Unit } from "../interfaces/Unit";
 import api from "../../axiosConfig";
+import { showNotification } from "./generics/GenericNotification";
 
 
 const LoginForm = () => {
@@ -36,19 +37,14 @@ const LoginForm = () => {
   const handleLogin = async (email: string, password: string) => {
     try {
       const response = await axios.post('http://localhost:8080/auth/login', { email, password });
-      const  token  = response.data.token;
-      console.log("Token recebido: " + token);
-  
+      const token = response.data.token;
+    
       localStorage.setItem('token', token);
-      
+
       signIn(token); 
-      const role = getRoleFromToken(token);
-      console.log("token biri" + token)
-      console.log("Role logada: " + role)
 
     } catch (error) {
-      console.error("Erro no login: ", error);
-      alert("Falha no login");
+      showNotification('error', 'Falha no login', 'Erro ao tentar fazer login. Verifique suas credenciais e tente novamente.');
     }
     finally{
       var token = localStorage.getItem('token')
@@ -60,7 +56,6 @@ const LoginForm = () => {
 
 const doRedirect = (token: string) => {
   const role = getRoleFromToken(token)
-  console.log("Role obtida: " + role)
   if (role === 'ADMIN') {
     navigate("/admin");
   } else if (role === 'USER') {
@@ -179,7 +174,7 @@ const SignUpForm = ({setRadioOption}: any) => {
        });
        if(response.status === 200){
          setRadioOption("login")
-         alert("Conta criada com sucesso!")
+         showNotification('success', 'Conta criada', 'Conta criada com sucesso!')
        }
      }catch(error){
        setError("Erro ao se registrar")

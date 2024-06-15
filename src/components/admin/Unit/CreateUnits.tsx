@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Form, Input, Button, ConfigProvider, Select } from 'antd';
 import api from '../../../../axiosConfig';
 import locale from 'antd/lib/locale/pt_BR';
+import { showNotification } from '../../generics/GenericNotification';
 
 const CreateUnits: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(false);
@@ -18,13 +19,12 @@ const CreateUnits: React.FC = () => {
 
         api.post('/units/create', unit)
             .then(response => {
-                console.log('Unidade criada:', response.data);
-                alert('Unidade criada com sucesso!');
+                showNotification("success", "Unidade criada", "Unidade criada com sucesso!");
                 setLoading(false);
             })
             .catch(error => {
                 console.error('Erro ao criar unidade:', error);
-                alert('Erro ao criar unidade!');
+                showNotification("error", "Erro ao criar unidade", error);
                 setLoading(false);
             });
     };
