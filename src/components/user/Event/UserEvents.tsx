@@ -33,7 +33,7 @@ const UserEvents: React.FC = () => {
     }, [userEmail]);
 
     const handleEnterClick = (event: Event) => {
-        navigate(`/user/events/${event.id}/iframe`, { state: { iframe: event.iframe } });
+        navigate(`/user/events/${event.id}/iframe`, { state: { iframe: event.iframe, title: event.title } });
     };
 
     const columns: ColumnsType<Event> = [

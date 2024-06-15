@@ -125,7 +125,7 @@ const CreateEvents: React.FC = () => {
                                 name="startDate"
                                 rules={[{ required: true, message: 'Por favor selecione a data de início.' }]}
                             >
-                                <DatePicker placeholder='Data início' />
+                                <DatePicker placeholder='Data início' disabledDate={(current) => current && current < moment().startOf('day')} />
                             </Form.Item>
                             <Form.Item
                                 name="startTime"
@@ -137,13 +137,13 @@ const CreateEvents: React.FC = () => {
                                 name="endDate"
                                 rules={[{ required: true, message: 'Por favor selecione a data de término.' }]}
                             >
-                                <DatePicker placeholder='Data fim' />
+                                <DatePicker placeholder='Data fim'  disabledDate={(current) => current && current < moment().startOf('day')}/>
                             </Form.Item>
                             <Form.Item
                                 name="endTime"
                                 rules={[{ required: true, message: 'Por favor selecione a hora de término.' }]}
                             >
-                                <TimePicker placeholder='Hora fim' />
+                                <TimePicker placeholder='Hora fim'  />
                             </Form.Item>
                         </div>
                         <div className='input-group-horizontal'>
