@@ -75,7 +75,7 @@ const CreateEvents: React.FC = () => {
 
             const response = await api.get(`/events/public/${eventId}/create-public-link`);
             
-            const generatedLink = response.data; // Supondo que o link público está em `response.data.link`
+            const generatedLink = response.data; 
             setPublicLink(generatedLink); 
             setLoadingPublicLink(false);
             showNotification("success", "Link público criado", "O link público foi criado com sucesso!");
@@ -130,7 +130,7 @@ const CreateEvents: React.FC = () => {
     };
 
     const toggleModal = () => {
-        setIsModalVisible(!isModalVisible); // Alternar a visibilidade da modal
+        setIsModalVisible(!isModalVisible);
     };
 
     return (
