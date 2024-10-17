@@ -18,27 +18,32 @@ import PainelUser from './components/user/PainelUser';
 import UserEvents from './components/user/Event/UserEvents';
 import EventIframe from './components/user/Event/EventIframe';
 
+import PublicEvent from './components/user/PublicEvent/PublicEvent'
+
 const App: React.FC = () => {
   return (
     <AuthProvider>
       <Router>
         <Routes>
 
+          {/* Rotas publicas */}
           <Route path="/" element={<Login />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/not-found" element={<NotFound />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/not-found" element={<NotFound />} />
+          <Route path="/events/public/:publicHash" element={<PublicEvent />} />
 
-            <Route path="/admin/*" element={<ProtectedRoute roles={['ADMIN']} element={<PainelAdmin />} />}>
-              <Route path="create-events" element={<CreateEvents />} />
-              <Route path="view-events" element={<ViewEvents />} />
-              <Route path="create-units" element={<CreateUnits />} />
-              <Route path="view-units" element={<ViewUnits />} />
-            </Route>
 
-            <Route path="/user/*" element={<ProtectedRoute roles={['USER']} element={<PainelUser />} />}> 
-              <Route path="view-events" element={<UserEvents />} />
-              <Route path="events/:eventId/iframe" element={<EventIframe />} />
-            </Route>
+          <Route path="/admin/*" element={<ProtectedRoute roles={['ADMIN']} element={<PainelAdmin />} />}>
+            <Route path="create-events" element={<CreateEvents />} />
+            <Route path="view-events" element={<ViewEvents />} />
+            <Route path="create-units" element={<CreateUnits />} />
+            <Route path="view-units" element={<ViewUnits />} />
+          </Route>
+
+          <Route path="/user/*" element={<ProtectedRoute roles={['USER']} element={<PainelUser />} />}> 
+            <Route path="view-events" element={<UserEvents />} />
+            <Route path="events/:eventId/iframe" element={<EventIframe />} />
+          </Route>
 
         </Routes>
       </Router>
