@@ -9,4 +9,6 @@ export interface Event {
     units: { id: number, name: string }[];
     users: { email: string }[];
     iframe: string;
+    isPublic: boolean;
+    publicLink: string;
 }
