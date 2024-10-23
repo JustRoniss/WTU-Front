@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import api from '../../../../axiosConfig';
 import { Spin, Alert } from 'antd';
 import { showNotification } from '../../generics/GenericNotification';
+import { ApiResponse } from '../../../interfaces/ApiResponse';
 
 
 const PublicEvent: React.FC = () => {
@@ -23,10 +24,10 @@ const PublicEvent: React.FC = () => {
       try {
         await new Promise(resolve => setTimeout(resolve, 7000));
 
-        const response = await api.get(`/events/public/${publicHash}`);
+        const response = await api.get<ApiResponse<string>>(`/events/public/${publicHash}`);
 
         if (response.data) {
-          setEventData(response.data);
+          setEventData(response.data.data);
         } else {
           setError('Evento público não encontrado ou inválido.');
         }

@@ -3,6 +3,7 @@ import { Form, Input, Button, ConfigProvider, Select } from 'antd';
 import api from '../../../../axiosConfig';
 import locale from 'antd/lib/locale/pt_BR';
 import { showNotification } from '../../generics/GenericNotification';
+import { ApiResponse } from '../../../interfaces/ApiResponse';
 
 const CreateUnits: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(false);
@@ -17,7 +18,7 @@ const CreateUnits: React.FC = () => {
             franchised,
         };
 
-        api.post('/units/create', unit)
+        api.post<ApiResponse<string>>('/units/create', unit)
             .then(response => {
                 showNotification("success", "Unidade criada", "Unidade criada com sucesso!");
                 setLoading(false);

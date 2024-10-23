@@ -6,9 +6,11 @@ import { Event } from '../../../interfaces/Event';
 import { ColumnsType } from 'antd/es/table';
 import { useAuth } from '../../../security/AuthProvider';
 import { useNavigate } from 'react-router-dom';
+import { ApiResponse } from '../../../interfaces/ApiResponse';
+import { Invite } from '../../../interfaces/Invite';
 
 const UserEvents: React.FC = () => {
-    const [events, setEvents] = useState<Event[]>([]);
+    const [invites, setInvites] = useState<Invite[]>([]);
     const { getEmailFromToken } = useAuth();
     const navigate = useNavigate();
 
@@ -17,13 +19,13 @@ const UserEvents: React.FC = () => {
     useEffect(() => {
         const fetchEvents = async () => {
             try {
-                const response = await api.get<Event[]>(`/invites/get-invites/${userEmail}`);
-                const formattedEvents: Event[] = response.data.map(event => ({
+                const response = await api.get<ApiResponse<Invite[]>>(`/invites/get-invites/${userEmail}`);
+                const formattedInvites: Invite[] = response.data.data.map(event => ({
                     ...event,
                     startDate: moment(event.startDate),
                     endDate: moment(event.endDate)
                 }));
-                setEvents(formattedEvents);
+                setInvites(formattedInvites);
             } catch (error) {
                 console.error('Erro ao buscar eventos:', error);
             }
@@ -32,11 +34,11 @@ const UserEvents: React.FC = () => {
         fetchEvents();
     }, [userEmail]);
 
-    const handleEnterClick = (event: Event) => {
-        navigate(`/user/events/${event.id}/iframe`, { state: { iframe: event.iframe, title: event.title } });
+    const handleEnterClick = (invite: Invite) => {
+        navigate(`/user/events/${invite.eventId}/iframe`, { state: { iframe: invite.iframe, title: invite.title } });
     };
 
-    const columns: ColumnsType<Event> = [
+    const columns: ColumnsType<Invite> = [
         {
             title: 'Título',
             dataIndex: 'title',
@@ -71,7 +73,7 @@ const UserEvents: React.FC = () => {
             title: 'Ações',
             key: 'actions',
             align: 'center',
-            render: (_, record: Event) => {
+            render: (_, record: Invite) => {
                 const now = moment();
                 const buttonText = record.endDate.isAfter(now) ? 'Entrar' : 'Assistir gravação';
                 return (
@@ -87,7 +89,7 @@ const UserEvents: React.FC = () => {
         <div className='container'>
             <div style={{ padding: 24, minHeight: 360, background: '#fff' }}>
                 <h1 style={{ textAlign: "center", marginBottom: "1.5rem" }}>Eventos Convidados</h1>
-                <Table dataSource={events} columns={columns} rowKey="id" />
+                <Table dataSource={invites} columns={columns} rowKey="id" />
             </div>
         </div>
     );
