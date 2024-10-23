@@ -38,12 +38,16 @@ const App: React.FC = () => {
             <Route path="view-events" element={<ViewEvents />} />
             <Route path="create-units" element={<CreateUnits />} />
             <Route path="view-units" element={<ViewUnits />} />
+            <Route path="*" element={<NotFound />} />
           </Route>
 
           <Route path="/user/*" element={<ProtectedRoute roles={['USER']} element={<PainelUser />} />}> 
             <Route path="view-events" element={<UserEvents />} />
             <Route path="events/:eventId/iframe" element={<EventIframe />} />
+            <Route path="*" element={<NotFound />} />
           </Route>
+
+          <Route path="*" element={<NotFound />} />
 
         </Routes>
       </Router>

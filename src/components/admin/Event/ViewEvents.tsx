@@ -9,6 +9,7 @@ import { User } from '../../../interfaces/User';
 import { Unit } from '../../../interfaces/Unit';
 import { ColumnsType } from 'antd/es/table';
 import { showNotification } from '../../generics/GenericNotification';
+import { ApiResponse } from '../../../interfaces/ApiResponse';
 
 const ViewEvents: React.FC = () => {
     const [events, setEvents] = useState<Event[]>([]);
@@ -24,8 +25,8 @@ const ViewEvents: React.FC = () => {
     useEffect(() => {
         const fetchEvents = async () => {
             try {
-                const response = await api.get<Event[]>('/events/get-all');
-                const formattedEvents: Event[] = response.data.map(event => ({
+                const response = await api.get<ApiResponse<Event[]>>('/events/get-all');
+                const formattedEvents: Event[] = response.data.data.map(event => ({
                     ...event,
                     startDate: moment(event.startDate),
                     endDate: moment(event.endDate)
@@ -38,8 +39,8 @@ const ViewEvents: React.FC = () => {
 
         const fetchUnits = async () => {
             try {
-                const response = await api.get<Unit[]>('/units/get-all');
-                setUnits(response.data);
+                const response = await api.get<ApiResponse<Unit[]>>('/units/get-all');
+                setUnits(response.data.data);
             } catch (error) {
                 console.error('Erro ao buscar unidades:', error);
             }
@@ -77,7 +78,7 @@ const ViewEvents: React.FC = () => {
 
     const handleDelete = async (eventId: number) => {
         try {
-            await api.delete(`/events/delete/${eventId}`);
+            await api.delete<ApiResponse<Event>>(`/events/delete/${eventId}`);
             showNotification("success", "Evento removido", "Evento excluído com sucesso!");
             setEvents(prevEvents => prevEvents.filter(event => event.id !== eventId));
         } catch (error) {
@@ -89,7 +90,7 @@ const ViewEvents: React.FC = () => {
     const handleConfirm = async () => {
         if (currentEvent && currentEvent.id) {
             try {
-                const response = await api.put(`/events/edit/${currentEvent.id}`, {
+                const response = await api.put<ApiResponse<Event>>(`/events/edit/${currentEvent.id}`, {
                     title: currentEvent.title,
                     description: currentEvent.description,
                     startDate: currentEvent.startDate,
@@ -100,7 +101,7 @@ const ViewEvents: React.FC = () => {
                 });
                 showNotification("success", "Evento atualizado", "Evento atualizado com sucesso!");
                 setModalOpen(false);
-                setEvents(prevEvents => prevEvents.map(event => event.id === currentEvent.id ? { ...currentEvent, ...response.data } : event));
+                setEvents(prevEvents => prevEvents.map(event => event.id === currentEvent.id ? { ...currentEvent, ...response.data.data } : event));
             } catch (error) {
                 showNotification("error", "Erro ao atualizar o evento", "Não foi possível atualizar o evento. Entre em contato com nossa equipe de desenvolvimento");
                 console.error('Erro ao atualizar o evento:', error);

@@ -11,9 +11,10 @@ import { User } from './../../../interfaces/User';
 import { UnitDTO } from '../../../interfaces/dto/UnitDTO';
 import { UserDTO } from '../../../interfaces/dto/UserDTO';
 
-import { length } from 'localforage';
+
 import { showNotification } from '../../generics/GenericNotification';
 import GenericModal from '../../generics/GenericModal';
+import { ApiResponse } from '../../../interfaces/ApiResponse';
 
 
 
@@ -34,8 +35,8 @@ const CreateEvents: React.FC = () => {
     useEffect(() => {
         const fetchUnits = async () => {
             try {
-                const response = await api.get('/units/get-all');
-                setUnits(response.data);
+                const response = await api.get<ApiResponse<Unit[]>>('/units/get-all');
+                setUnits(response.data.data);
                 setLoadingUnits(false);
             } catch (error) {
                 console.error('Erro ao buscar unidades:', error);
@@ -73,9 +74,9 @@ const CreateEvents: React.FC = () => {
 
             await new Promise(resolve => setTimeout(resolve, 5000)); 
 
-            const response = await api.get(`/events/public/${eventId}/create-public-link`);
+            const response = await api.get<ApiResponse<string>>(`/events/public/${eventId}/create-public-link`);
             
-            const generatedLink = response.data; 
+            const generatedLink = response.data.data; 
             setPublicLink(generatedLink); 
             setLoadingPublicLink(false);
             showNotification("success", "Link público criado", "O link público foi criado com sucesso!");
@@ -114,11 +115,11 @@ const CreateEvents: React.FC = () => {
             isPublic
         };
 
-        api.post('/events/create', event)
+        api.post<ApiResponse<number>>('/events/create', event)
             .then(response => {
                 showNotification("success", "Evento criado", "Evento criado com sucesso!")
                 form.resetFields();
-                setEventId(response.data)
+                setEventId(response.data.data)
                 if(event.isPublic){
                     setIsModalVisible(true);
                 }
