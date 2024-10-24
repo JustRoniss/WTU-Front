@@ -10,7 +10,6 @@ import { User } from './../../../interfaces/User';
 import { UnitDTO } from '../../../interfaces/dto/UnitDTO';
 import { UserDTO } from '../../../interfaces/dto/UserDTO';
 
-import { length } from 'localforage';
 import { showNotification } from '../../generics/GenericNotification';
 
 
@@ -23,7 +22,8 @@ const CreateEvents: React.FC = () => {
     const [loadingUnits, setLoadingUnits] = useState<boolean>(true);
     const [loadingUsers, setLoadingUsers] = useState<boolean>(true);
     const [form] = Form.useForm();
-
+    const [startDate, setStartDate] = useState<moment.Moment | null>(null);
+    const [startTime, setStartTime] = useState<moment.Moment | null>(null);
 
     useEffect(() => {
         const fetchUnits = async () => {
@@ -104,6 +104,30 @@ const CreateEvents: React.FC = () => {
             });
     };
 
+    const disabledEndDate = (current: moment.Moment) => {
+        return startDate ? current && current < startDate.startOf('day') : false;
+    };
+
+    const disabledEndTime = () => {
+        if (!startTime) {
+            return {};
+        }
+        const hours = startTime.hour();
+        const minutes = startTime.minute();
+        
+        return {
+            disabledHours: () => Array.from({ length: 24 }, (_, i) => i).splice(0, hours),
+            
+            disabledMinutes: (selectedHour: number) => {
+                if (selectedHour === hours) {
+                    return Array.from({ length: 60 }, (_, i) => i).splice(0, minutes + 1);
+                }
+                return [];
+            },
+        };
+    };
+    
+
     return (
         <ConfigProvider locale={locale}>
             <div className='container'>
@@ -122,31 +146,49 @@ const CreateEvents: React.FC = () => {
                         >
                             <Input showCount maxLength={30} placeholder="Descrição do evento" style={{ width: 626 }} />
                         </Form.Item>
-                        <p style={{ color: "rgba(0, 0, 0, 0.50)", textAlign: "center" }}>Data de inicio e fim do evento</p>
+                        <p style={{ color: "rgba(0, 0, 0, 0.50)", textAlign: "center" }}>Data de início e fim do evento</p>
                         <div className='input-group-horizontal'>
                             <Form.Item
                                 name="startDate"
                                 rules={[{ required: true, message: 'Por favor selecione a data de início.' }]}
                             >
-                                <DatePicker placeholder='Data início' disabledDate={(current) => current && current < moment().startOf('day')} />
+                                <DatePicker
+                                    placeholder='Data início'
+                                    format="DD/MM/YYYY"
+                                    disabledDate={(current) => current && current < moment().startOf('day')}
+                                    onChange={setStartDate}
+                                />
                             </Form.Item>
                             <Form.Item
                                 name="startTime"
                                 rules={[{ required: true, message: 'Por favor selecione a hora de início.' }]}
                             >
-                                <TimePicker placeholder='Hora início' />
+                                <TimePicker
+                                    placeholder='Hora início'
+                                    format="HH:mm"
+                                    onChange={setStartTime}
+                                    showNow={false}
+                                />
                             </Form.Item>
                             <Form.Item
                                 name="endDate"
                                 rules={[{ required: true, message: 'Por favor selecione a data de término.' }]}
-                            >
-                                <DatePicker placeholder='Data fim'  disabledDate={(current) => current && current < moment().startOf('day')}/>
+                            >1
+                                <DatePicker
+                                    placeholder='Data fim'
+                                    disabledDate={disabledEndDate}
+                                />
                             </Form.Item>
                             <Form.Item
                                 name="endTime"
                                 rules={[{ required: true, message: 'Por favor selecione a hora de término.' }]}
                             >
-                                <TimePicker placeholder='Hora fim'  />
+                                <TimePicker
+                                    placeholder='Hora fim'
+                                    format="HH:mm"
+                                    disabledTime={disabledEndTime}
+                                    showNow={false}
+                                />
                             </Form.Item>
                         </div>
                         <div className='input-group-horizontal'>
