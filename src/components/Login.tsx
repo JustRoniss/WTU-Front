@@ -22,6 +22,7 @@ import {
 import { Unit } from "../interfaces/Unit";
 import api from "../../axiosConfig";
 import { showNotification } from "./generics/GenericNotification";
+import { ApiResponse } from "../interfaces/ApiResponse";
 
 
 const LoginForm = () => {
@@ -134,8 +135,8 @@ const SignUpForm = ({setRadioOption}: any) => {
   useEffect(() => {
     const fetchUnits = async () => {
       try {
-        const response = await api.get<Unit[]>('/units/get-all');
-        setUnits(response.data);
+        const response = await api.get<ApiResponse<Unit[]>>('/units/get-all');
+        setUnits(response.data.data);
       } catch (error) {
         console.error("Erro ao buscar unidades:", error);
       }
