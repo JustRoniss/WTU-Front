@@ -11,7 +11,6 @@ import { User } from './../../../interfaces/User';
 import { UnitDTO } from '../../../interfaces/dto/UnitDTO';
 import { UserDTO } from '../../../interfaces/dto/UserDTO';
 
-
 import { showNotification } from '../../generics/GenericNotification';
 import GenericModal from '../../generics/GenericModal';
 import { ApiResponse } from '../../../interfaces/ApiResponse';
@@ -26,12 +25,13 @@ const CreateEvents: React.FC = () => {
     const [loadingUnits, setLoadingUnits] = useState<boolean>(true);
     const [loadingUsers, setLoadingUsers] = useState<boolean>(true);
     const [form] = Form.useForm();
-
     const [loadingPublicLink, setLoadingPublicLink] = useState(false); 
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [publicLink, setPublicLink] = useState<string | null>(null);
     const [eventId, setEventId] = useState<number>()
-    
+    const [startDate, setStartDate] = useState<moment.Moment | null>(null);
+    const [startTime, setStartTime] = useState<moment.Moment | null>(null);
+
     useEffect(() => {
         const fetchUnits = async () => {
             try {
@@ -86,6 +86,7 @@ const CreateEvents: React.FC = () => {
         }
     };
 
+
     const onFinish = (values: EventFormValues) => {
         const { startDate, startTime, endDate, endTime, title, description, unit, usersEmail, iframe, isPublic } = values;
 
@@ -99,11 +100,15 @@ const CreateEvents: React.FC = () => {
             minute: endTime.minute(),
         });
 
+        
+        
         const selectedUnits: UnitDTO[] = units.filter(u => unit && unit.includes(u.id)).map(u => ({ id: u.id }));
        
         
         const selectedUsers: UserDTO[] = users.filter(u =>usersEmail && usersEmail.includes(u.email)).map(u => ({ email: u.email }));
         
+            
+
         const event = {
             title,
             description,
@@ -129,10 +134,33 @@ const CreateEvents: React.FC = () => {
                 showNotification("error", "Erro ao criar evento", error)
             });
     };
-
     const toggleModal = () => {
         setIsModalVisible(!isModalVisible);
     };
+
+    const disabledEndDate = (current: moment.Moment) => {
+        return startDate ? current && current < startDate.startOf('day') : false;
+    };
+
+    const disabledEndTime = () => {
+        if (!startTime) {
+            return {};
+        }
+        const hours = startTime.hour();
+        const minutes = startTime.minute();
+        
+        return {
+            disabledHours: () => Array.from({ length: 24 }, (_, i) => i).splice(0, hours),
+            
+            disabledMinutes: (selectedHour: number) => {
+                if (selectedHour === hours) {
+                    return Array.from({ length: 60 }, (_, i) => i).splice(0, minutes + 1);
+                }
+                return [];
+            },
+        };
+    };
+    
 
     return (
         <ConfigProvider locale={locale}>
@@ -152,31 +180,50 @@ const CreateEvents: React.FC = () => {
                         >
                             <Input showCount maxLength={30} placeholder="Descrição do evento" style={{ width: 626 }} />
                         </Form.Item>
-                        <p style={{ color: "rgba(0, 0, 0, 0.50)", textAlign: "center" }}>Data de inicio e fim do evento</p>
+                        <p style={{ color: "rgba(0, 0, 0, 0.50)", textAlign: "center" }}>Data de início e fim do evento</p>
                         <div className='input-group-horizontal'>
                             <Form.Item
                                 name="startDate"
                                 rules={[{ required: true, message: 'Por favor selecione a data de início.' }]}
                             >
-                                <DatePicker placeholder='Data início' disabledDate={(current) => current && current < moment().startOf('day')} />
+                                <DatePicker
+                                    placeholder='Data início'
+                                    format="DD/MM/YYYY"
+                                    disabledDate={(current) => current && current < moment().startOf('day')}
+                                    onChange={setStartDate}
+                                />
                             </Form.Item>
                             <Form.Item
                                 name="startTime"
                                 rules={[{ required: true, message: 'Por favor selecione a hora de início.' }]}
                             >
-                                <TimePicker placeholder='Hora início' />
+                                <TimePicker
+                                    placeholder='Hora início'
+                                    format="HH:mm"
+                                    onChange={setStartTime}
+                                    showNow={false}
+                                />
                             </Form.Item>
                             <Form.Item
                                 name="endDate"
                                 rules={[{ required: true, message: 'Por favor selecione a data de término.' }]}
                             >
-                                <DatePicker placeholder='Data fim'  disabledDate={(current) => current && current < moment().startOf('day')}/>
+                                <DatePicker
+                                    placeholder='Data fim'
+                                    disabledDate={disabledEndDate}
+                                />
                             </Form.Item>
                             <Form.Item
                                 name="endTime"
                                 rules={[{ required: true, message: 'Por favor selecione a hora de término.' }]}
                             >
-                                <TimePicker placeholder='Hora fim'  />
+                                <TimePicker
+                                    placeholder='Hora fim'
+                                    format="HH:mm"
+                                    disabledTime={disabledEndTime}
+                                    showNow={false}
+                                />
+                                
                             </Form.Item>
                         </div>
                         <div className='input-group-horizontal'>
