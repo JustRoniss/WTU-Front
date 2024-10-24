@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Input, Button, DatePicker, Select, TimePicker, ConfigProvider } from 'antd';
+import { Form, Input, Button, DatePicker, Select, TimePicker, ConfigProvider, Checkbox, Tooltip, Spin } from 'antd';
+import { CopyOutlined} from '@ant-design/icons';
 import moment from 'moment';
 import api from '../../../../axiosConfig';
 import './../../../styles/createEvents.css';
@@ -10,8 +11,10 @@ import { User } from './../../../interfaces/User';
 import { UnitDTO } from '../../../interfaces/dto/UnitDTO';
 import { UserDTO } from '../../../interfaces/dto/UserDTO';
 
-import { length } from 'localforage';
+
 import { showNotification } from '../../generics/GenericNotification';
+import GenericModal from '../../generics/GenericModal';
+import { ApiResponse } from '../../../interfaces/ApiResponse';
 
 
 
@@ -24,12 +27,16 @@ const CreateEvents: React.FC = () => {
     const [loadingUsers, setLoadingUsers] = useState<boolean>(true);
     const [form] = Form.useForm();
 
-
+    const [loadingPublicLink, setLoadingPublicLink] = useState(false); 
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [publicLink, setPublicLink] = useState<string | null>(null);
+    const [eventId, setEventId] = useState<number>()
+    
     useEffect(() => {
         const fetchUnits = async () => {
             try {
-                const response = await api.get('/units/get-all');
-                setUnits(response.data);
+                const response = await api.get<ApiResponse<Unit[]>>('/units/get-all');
+                setUnits(response.data.data);
                 setLoadingUnits(false);
             } catch (error) {
                 console.error('Erro ao buscar unidades:', error);
@@ -61,8 +68,26 @@ const CreateEvents: React.FC = () => {
         return Promise.resolve();
     }
 
+    const handleCreatePublicLink = async () => {
+        try {
+            setLoadingPublicLink(true);
+
+            await new Promise(resolve => setTimeout(resolve, 5000)); 
+
+            const response = await api.get<ApiResponse<string>>(`/events/public/${eventId}/create-public-link`);
+            
+            const generatedLink = response.data.data; 
+            setPublicLink(generatedLink); 
+            setLoadingPublicLink(false);
+            showNotification("success", "Link público criado", "O link público foi criado com sucesso!");
+        } catch (error: any) {
+            setLoadingPublicLink(false);
+            showNotification("error", "Erro ao criar link público", error.message || "Erro desconhecido");
+        }
+    };
+
     const onFinish = (values: EventFormValues) => {
-        const { startDate, startTime, endDate, endTime, title, description, unit, usersEmail, iframe } = values;
+        const { startDate, startTime, endDate, endTime, title, description, unit, usersEmail, iframe, isPublic } = values;
 
         const startDateTime = moment(startDate).set({
             hour: startTime.hour(),
@@ -74,15 +99,11 @@ const CreateEvents: React.FC = () => {
             minute: endTime.minute(),
         });
 
-        
-        
         const selectedUnits: UnitDTO[] = units.filter(u => unit && unit.includes(u.id)).map(u => ({ id: u.id }));
        
         
         const selectedUsers: UserDTO[] = users.filter(u =>usersEmail && usersEmail.includes(u.email)).map(u => ({ email: u.email }));
         
-            
-
         const event = {
             title,
             description,
@@ -91,17 +112,26 @@ const CreateEvents: React.FC = () => {
             units: selectedUnits,
             users: selectedUsers,
             iframe,
+            isPublic
         };
 
-        api.post('/events/create', event)
+        api.post<ApiResponse<number>>('/events/create', event)
             .then(response => {
                 showNotification("success", "Evento criado", "Evento criado com sucesso!")
                 form.resetFields();
+                setEventId(response.data.data)
+                if(event.isPublic){
+                    setIsModalVisible(true);
+                }
             })
             .catch(error => {
                 console.error('Erro ao criar evento:', error);
                 showNotification("error", "Erro ao criar evento", error)
             });
+    };
+
+    const toggleModal = () => {
+        setIsModalVisible(!isModalVisible);
     };
 
     return (
@@ -202,6 +232,14 @@ const CreateEvents: React.FC = () => {
                             <Input.TextArea placeholder="Iframe do streamyard" style={{ width: 626 }} />
                         </Form.Item>
                         <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginTop: 3 }}>
+                            <Tooltip title="Essa opção criará um link de acesso para pessoas que não possuem conta na WTU">
+                                <Form.Item name="isPublic" valuePropName="checked">
+                                    <Checkbox>Acesso público</Checkbox>
+                                </Form.Item>
+                            </Tooltip>
+
+                        </div> 
+                        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginTop: 3 }}>
                             <Form.Item>
                                 <Button type="primary" htmlType="submit">
                                     Criar Evento
@@ -210,6 +248,50 @@ const CreateEvents: React.FC = () => {
                         </div>
                     </Form>
                 </div>
+
+                <GenericModal
+                    isOpen={isModalVisible}
+                    toggle={toggleModal}
+                    title="Evento público"
+                    onConfirm={() => handleCreatePublicLink()} 
+                    confirmText="Criar Link"
+                    cancelText="Permanecer privado"
+                >
+                    {loadingPublicLink ? (
+                        <div style={{ textAlign: 'center' }}>
+                            <Spin />
+                            <p>Criando link público para este evento...</p>
+                        </div>
+                    ) : publicLink ? ( 
+                        <div style={{ textAlign: 'center' }}>
+                        <p>Link público criado com sucesso:</p>
+                        <Input
+                            value={publicLink}
+                            readOnly
+                            addonAfter={
+                                <Tooltip title="Copiar link">
+                                    <Button
+                                        icon={<CopyOutlined />}
+                                        onClick={() => {
+                                            navigator.clipboard.writeText(publicLink);
+                                            showNotification("success", "Link copiado", "O link foi copiado para a área de transferência.");
+                                        }}
+                                    />
+                                </Tooltip>
+                            }
+                        />
+                        </div>
+                    ) : (
+                        <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center" }}>
+                            <img 
+                                src="../../../../public/Logo.png" 
+                                alt="Logo da aplicação" 
+                                style={{ width: '100px', marginTop: '20px' }}
+                            />
+                            <p style={{ marginTop: '10px' }}>Ação não reversível. <br /> Está pronto para isso?</p>
+                        </div>
+                    )}
+                </GenericModal>
             </div>
         </ConfigProvider>
     );

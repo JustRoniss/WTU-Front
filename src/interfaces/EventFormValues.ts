@@ -10,4 +10,5 @@ export interface EventFormValues {
     unit: string[];
     usersEmail: string[];
     iframe: string;
+    isPublic: boolean;
 }

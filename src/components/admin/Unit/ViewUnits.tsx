@@ -6,6 +6,7 @@ import GenericModal from '../../generics/GenericModal';
 import { Unit } from '../../../interfaces/Unit';
 import { ColumnsType } from 'antd/es/table';
 import { showNotification } from '../../generics/GenericNotification';
+import { ApiResponse } from '../../../interfaces/ApiResponse';
 
 const ViewUnits: React.FC = () => {
     const [units, setUnits] = useState<Unit[]>([]);
@@ -17,8 +18,8 @@ const ViewUnits: React.FC = () => {
     useEffect(() => {
         const fetchUnits = async () => {
             try {
-                const response = await api.get<Unit[]>('/units/get-all');
-                setUnits(response.data);
+                const response = await api.get<ApiResponse<Unit[]>>('/units/get-all');
+                setUnits(response.data.data);
                 setLoadingUnits(false);
             } catch (error) {
                 console.error('Erro ao buscar unidades:', error);
@@ -51,7 +52,7 @@ const ViewUnits: React.FC = () => {
                     ...updatedValues
                 };
 
-                const response = await api.put(`/units/edit/${updatedUnit.id}`, updatedUnit);
+                const response = await api.put<ApiResponse<string>>(`/units/edit/${updatedUnit.id}`, updatedUnit);
                 showNotification("success", "Unidade atualizada", "Unidade atualizada com sucesso!");
                 setModalOpen(false);
                 setUnits(prevUnits => prevUnits.map(unit => unit.id === updatedUnit.id ? { ...updatedUnit, ...response.data } : unit));
