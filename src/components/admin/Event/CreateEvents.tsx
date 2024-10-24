@@ -117,11 +117,13 @@ const CreateEvents: React.FC = () => {
 
         api.post<ApiResponse<number>>('/events/create', event)
             .then(response => {
-                showNotification("success", "Evento criado", "Evento criado com sucesso!")
-                form.resetFields();
-                setEventId(response.data.data)
-                if(event.isPublic){
-                    setIsModalVisible(true);
+                if(response.status == 200){
+                    showNotification("success", "Evento criado", "Evento criado com sucesso!")
+                    form.resetFields();
+                    setEventId(response.data.data)
+                    if(event.isPublic){
+                        setIsModalVisible(true);
+                    }
                 }
             })
             .catch(error => {
