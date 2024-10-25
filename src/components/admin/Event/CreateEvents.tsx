@@ -15,6 +15,7 @@ import { showNotification } from '../../generics/GenericNotification';
 import GenericModal from '../../generics/GenericModal';
 import { message } from 'antd';
 import { ApiResponse } from '../../../interfaces/ApiResponse';
+import dayjs, { Dayjs } from 'dayjs';
 
 
 
@@ -139,27 +140,34 @@ const CreateEvents: React.FC = () => {
         setIsModalVisible(!isModalVisible);
     };
 
-    const disabledEndDate = (current: moment.Moment) => {
-        if (!startDate) return true; // Bloqueia data de fim até data de início estar definida
-        return current && current < startDate.startOf('day');
+    const disabledEndDate = (current: Dayjs) => {
+
+        if (!startDate) return current && current < dayjs().startOf('day'); 
+    
+        const start = dayjs(startDate.toISOString()); 
+    
+        return current && (current.isBefore(start.startOf('day')) || current.isAfter(start.endOf('day')));
     };
     
-    const validateEndTime = (endDate, endTime) => {
+    const validateEndTime = (endDate: any, endTime: any) => {
         const startDate = form.getFieldValue("startDate");
         const startTime = form.getFieldValue("startTime");
     
         if (startDate && startTime && endDate && endTime) {
             const start = moment(startDate).set({ hour: startTime.hour(), minute: startTime.minute() });
             const end = moment(endDate).set({ hour: endTime.hour(), minute: endTime.minute() });
-            
+    
             const duration = moment.duration(end.diff(start));
-            if (duration.asHours() > 8) {
-                form.setFieldsValue({ endTime: null }); // Limpa o campo se a duração exceder
+            const hours = duration.asHours();
+    
+            if (hours > 8 || hours < 0) {
+                form.setFieldsValue({ endTime: null });
                 message.error("A duração do evento não pode exceder 8 horas.");
             }
         }
     };
-    
+
+
     const disabledEndTime = () => {
         if (!startTime) {
             return {};
@@ -170,7 +178,7 @@ const CreateEvents: React.FC = () => {
         return {
             disabledHours: () => Array.from({ length: 24 }, (_, i) => i).splice(0, hours),
             
-            disabledMinutes: (selectedHour) => {
+            disabledMinutes: (selectedHour : any) => {
                 if (selectedHour === hours) {
                     return Array.from({ length: 60 }, (_, i) => i).splice(0, minutes + 1);
                 }
@@ -210,7 +218,7 @@ const CreateEvents: React.FC = () => {
                             format="DD/MM/YYYY"
                             disabledDate={(current) => current && current < moment().startOf('day')}
                             onChange={(date) => {
-                                setStartDate(date);
+                                setStartDate(date ? moment(date.toDate()) : null); 
                                 form.setFieldsValue({ endDate: null, endTime: null });
                             }}
                         />
@@ -223,7 +231,7 @@ const CreateEvents: React.FC = () => {
                             placeholder='Hora início'
                             format="HH:mm"
                             onChange={(time) => {
-                                setStartTime(time);
+                                setStartTime(time ? moment(time.toDate()) : null); 
                                 form.setFieldsValue({ endTime: null });
                             }}
                             showNow={false}
