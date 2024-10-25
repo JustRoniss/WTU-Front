@@ -4,16 +4,20 @@ import api from '../../../../axiosConfig';
 import { Spin, Alert } from 'antd';
 import { showNotification } from '../../generics/GenericNotification';
 import { ApiResponse } from '../../../interfaces/ApiResponse';
+import { Layout } from 'antd';
+import { Outlet } from 'react-router-dom';
+import './PublicEvent.css'; 
 
+const { Header, Content, Footer, Sider } = Layout;
 
 const PublicEvent: React.FC = () => {
+  const [collapsed, setCollapsed] = useState(false);
   const { publicHash } = useParams<{ publicHash: string }>();
   const [eventData, setEventData] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-
     if (!publicHash) {
       setError('Hash inválida.');
       setLoading(false);
@@ -63,10 +67,29 @@ const PublicEvent: React.FC = () => {
   }
 
   return (
-    <div className='container'>
-      <h1>Evento Público</h1>
-      <div className='iframe-container' dangerouslySetInnerHTML={{ __html: eventData || '' }} />
-    </div>
+    <Layout style={{ minHeight: '100vh' }}>
+      <Sider collapsible collapsed={collapsed} onCollapse={setCollapsed} style={{ position: 'fixed', left: 0, top: 0, bottom: 0 }}>
+        <img 
+          src="../../../public/Logo.png" 
+          alt="logo" 
+          style={{ height: '64px', width: '90px', margin: '16px' }} 
+        />
+      </Sider>
+      <Layout style={{ marginLeft: collapsed ? 80 : 200 }}>
+        <Header style={{ position: 'fixed', top: 0, left: collapsed ? 80 : 200, right: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '50px 16px', zIndex: 1, background: '#001529' }}>
+        </Header>
+        <Content style={{ margin: '64px 16px 0', padding: '24px', overflowY: 'auto', height: 'calc(100vh - 128px)' }}>
+          <Outlet />
+          <div className='container'>
+            <h1 className='h1EventPublic'>Evento Público</h1>
+            <div className='iframe-container' dangerouslySetInnerHTML={{ __html: eventData || '' }} />
+          </div>                
+        </Content>
+        <Footer style={{ textAlign: 'center', marginLeft: collapsed ? 80 : 200 }}>
+          Wise To Us {new Date().getFullYear()} Created by Ronaldo
+        </Footer>
+      </Layout>
+    </Layout>
   );
 };
 
