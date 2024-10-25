@@ -13,7 +13,9 @@ import { UserDTO } from '../../../interfaces/dto/UserDTO';
 
 import { showNotification } from '../../generics/GenericNotification';
 import GenericModal from '../../generics/GenericModal';
+import { message } from 'antd';
 import { ApiResponse } from '../../../interfaces/ApiResponse';
+import dayjs, { Dayjs } from 'dayjs';
 
 
 
@@ -138,9 +140,33 @@ const CreateEvents: React.FC = () => {
         setIsModalVisible(!isModalVisible);
     };
 
-    const disabledEndDate = (current: moment.Moment) => {
-        return startDate ? current && current < startDate.startOf('day') : false;
+    const disabledEndDate = (current: Dayjs) => {
+
+        if (!startDate) return current && current < dayjs().startOf('day'); 
+    
+        const start = dayjs(startDate.toISOString()); 
+    
+        return current && (current.isBefore(start.startOf('day')) || current.isAfter(start.endOf('day')));
     };
+    
+    const validateEndTime = (endDate: any, endTime: any) => {
+        const startDate = form.getFieldValue("startDate");
+        const startTime = form.getFieldValue("startTime");
+    
+        if (startDate && startTime && endDate && endTime) {
+            const start = moment(startDate).set({ hour: startTime.hour(), minute: startTime.minute() });
+            const end = moment(endDate).set({ hour: endTime.hour(), minute: endTime.minute() });
+    
+            const duration = moment.duration(end.diff(start));
+            const hours = duration.asHours();
+    
+            if (hours > 8 || hours < 0) {
+                form.setFieldsValue({ endTime: null });
+                message.error("A duração do evento não pode exceder 8 horas.");
+            }
+        }
+    };
+
 
     const disabledEndTime = () => {
         if (!startTime) {
@@ -148,11 +174,11 @@ const CreateEvents: React.FC = () => {
         }
         const hours = startTime.hour();
         const minutes = startTime.minute();
-        
+    
         return {
             disabledHours: () => Array.from({ length: 24 }, (_, i) => i).splice(0, hours),
             
-            disabledMinutes: (selectedHour: number) => {
+            disabledMinutes: (selectedHour : any) => {
                 if (selectedHour === hours) {
                     return Array.from({ length: 60 }, (_, i) => i).splice(0, minutes + 1);
                 }
@@ -161,6 +187,7 @@ const CreateEvents: React.FC = () => {
         };
     };
     
+
 
     return (
         <ConfigProvider locale={locale}>
@@ -182,49 +209,62 @@ const CreateEvents: React.FC = () => {
                         </Form.Item>
                         <p style={{ color: "rgba(0, 0, 0, 0.50)", textAlign: "center" }}>Data de início e fim do evento</p>
                         <div className='input-group-horizontal'>
+                        <Form.Item
+                        name="startDate"
+                        rules={[{ required: true, message: 'Por favor selecione a data de início.' }]}
+                    >
+                        <DatePicker
+                            placeholder='Data início'
+                            format="DD/MM/YYYY"
+                            disabledDate={(current) => current && current < moment().startOf('day')}
+                            onChange={(date) => {
+                                setStartDate(date ? moment(date.toDate()) : null); 
+                                form.setFieldsValue({ endDate: null, endTime: null });
+                            }}
+                        />
+                    </Form.Item>
                             <Form.Item
-                                name="startDate"
-                                rules={[{ required: true, message: 'Por favor selecione a data de início.' }]}
-                            >
-                                <DatePicker
-                                    placeholder='Data início'
-                                    format="DD/MM/YYYY"
-                                    disabledDate={(current) => current && current < moment().startOf('day')}
-                                    onChange={setStartDate}
-                                />
-                            </Form.Item>
+                        name="startTime"
+                        rules={[{ required: true, message: 'Por favor selecione a hora de início.' }]}
+                    >
+                        <TimePicker
+                            placeholder='Hora início'
+                            format="HH:mm"
+                            onChange={(time) => {
+                                setStartTime(time ? moment(time.toDate()) : null); 
+                                form.setFieldsValue({ endTime: null });
+                            }}
+                            showNow={false}
+                        />
+                    </Form.Item>
                             <Form.Item
-                                name="startTime"
-                                rules={[{ required: true, message: 'Por favor selecione a hora de início.' }]}
-                            >
-                                <TimePicker
-                                    placeholder='Hora início'
-                                    format="HH:mm"
-                                    onChange={setStartTime}
-                                    showNow={false}
-                                />
-                            </Form.Item>
-                            <Form.Item
-                                name="endDate"
-                                rules={[{ required: true, message: 'Por favor selecione a data de término.' }]}
-                            >
-                                <DatePicker
-                                    placeholder='Data fim'
-                                    disabledDate={disabledEndDate}
-                                />
-                            </Form.Item>
-                            <Form.Item
-                                name="endTime"
-                                rules={[{ required: true, message: 'Por favor selecione a hora de término.' }]}
-                            >
-                                <TimePicker
-                                    placeholder='Hora fim'
-                                    format="HH:mm"
-                                    disabledTime={disabledEndTime}
-                                    showNow={false}
-                                />
-                                
-                            </Form.Item>
+                        name="endDate"
+                        rules={[{ required: true, message: 'Por favor selecione a data de término.' }]}
+                    >
+                        <DatePicker
+                            placeholder='Data fim'
+                            format="DD/MM/YYYY"
+                            disabledDate={disabledEndDate}
+                            disabled={!startDate}
+                            onChange={(date) => {
+                                form.setFieldsValue({ endTime: null });
+                                validateEndTime(date, form.getFieldValue('endTime'));
+                            }}
+                        />
+                     </Form.Item>
+                    <Form.Item
+                        name="endTime"
+                        rules={[{ required: true, message: 'Por favor selecione a hora de término.' }]}
+                    >
+                        <TimePicker
+                            placeholder='Hora fim'
+                            format="HH:mm"
+                            disabledTime={disabledEndTime}
+                            disabled={!startTime}
+                            showNow={false}
+                            onChange={(time) => validateEndTime(form.getFieldValue('endDate'), time)}
+                        />
+                    </Form.Item>
                         </div>
                         <div className='input-group-horizontal'>
                             <Form.Item
