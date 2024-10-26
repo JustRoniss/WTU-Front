@@ -58,9 +58,9 @@ const LoginForm = () => {
 const doRedirect = (token: string) => {
   const role = getRoleFromToken(token)
   if (role === 'ADMIN') {
-    navigate("/admin");
+    navigate("/admin/view-events");
   } else if (role === 'USER') {
-    navigate("/user/");
+    navigate("/user/view-events");
   } else {
     navigate("/login");
   }

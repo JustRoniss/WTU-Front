@@ -43,9 +43,6 @@ const PainelAdmin: React.FC = () => {
                 <Content style={{ margin: '64px 16px 0', padding: '24px', overflowY: 'auto', height: 'calc(100vh - 128px)' }}>
                     <Outlet />
                 </Content>
-                <Footer style={{ textAlign: 'center', marginLeft: collapsed ? 80 : 200 }}>
-                    Wise To Us {new Date().getFullYear()} Created by Ronaldo
-                </Footer>
             </Layout>
         </Layout>
     );
