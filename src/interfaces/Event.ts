@@ -11,4 +11,5 @@ export interface Event {
     iframe: string;
     isPublic: boolean;
     publicLink: string;
+    creationDate: moment.Moment;
 }

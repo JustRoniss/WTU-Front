@@ -7,4 +7,5 @@ export interface Invite {
     iframe: string;
     startDate: moment.Moment;
     endDate: moment.Moment;
+    creationDate: moment.Moment;
 }
